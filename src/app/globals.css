@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --purple-gradient-start: #8B5CF6;
+  --purple-gradient-end: #A855F7;
+  --blue-primary: #4A90E2;
+  --blue-secondary: #5B9BD5;
+  --gray-text: #6B7280;
+  --gray-light: #F3F4F6;
 }
 
 @theme inline {
@@ -10,6 +16,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-purple-gradient-start: var(--purple-gradient-start);
+  --color-purple-gradient-end: var(--purple-gradient-end);
+  --color-blue-primary: var(--blue-primary);
+  --color-blue-secondary: var(--blue-secondary);
+  --color-gray-text: var(--gray-text);
+  --color-gray-light: var(--gray-light);
 }
 
 @media (prefers-color-scheme: dark) {
