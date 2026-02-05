@@ -3,13 +3,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-purple-gradient-start: var(--purple-gradient-start);
+  --color-purple-gradient-end: var(--purple-gradient-end);
+  --color-blue-primary: var(--blue-primary);
+  --color-blue-secondary: var(--blue-secondary);
+  --color-gray-text: var(--gray-text);
+  --color-gray-light: var(--gray-light);
 }
 
 @media (prefers-color-scheme: dark) {
