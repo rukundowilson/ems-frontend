@@ -18,7 +18,7 @@ type TimeSlot = {
 };
 
 // Service information mapping
-const serviceInfo: Record<string, { title: string; subtitle: string; description: string }> = {
+const serviceInfo: Record<string, { title: string; subtitle: string; description?: string }> = {
   'emergency-care': {
     title: 'Emergency Care',
     subtitle: '24/7 urgent medical assistance',
@@ -72,58 +72,72 @@ const serviceInfo: Record<string, { title: string; subtitle: string; description
   'ophthalmology': {
     title: 'Ophthalmology',
     subtitle: 'Expert eye care services',
+    description: 'Eye care services including vision tests, cataract surgery, and eye disease treatment.',
   },
   'ent': {
     title: 'ENT Services',
     subtitle: 'Ear, nose, and throat specialists',
+    description: 'Treatment for ear infections, sinus problems, tonsillitis, and hearing issues.',
   },
   'dermatology': {
     title: 'Dermatology',
     subtitle: 'Skin health and treatment',
+    description: 'Skin care including treatment for acne, rashes, infections, and skin conditions.',
   },
   'neurology': {
     title: 'Neurology',
     subtitle: 'Brain and nervous system care',
+    description: 'Diagnosis and treatment of nervous system disorders including stroke and epilepsy.',
   },
   'psychiatry': {
     title: 'Mental Health',
     subtitle: 'Support for your wellbeing',
+    description: 'Mental health services including counseling and treatment for depression and anxiety.',
   },
   'pharmacy': {
     title: 'Pharmacy',
     subtitle: 'Medication and pharmaceutical care',
+    description: 'In-house pharmacy providing prescribed medications and pharmaceutical care.',
   },
   'dialysis': {
     title: 'Dialysis',
     subtitle: 'Kidney care services',
+    description: 'Kidney dialysis services for patients with chronic kidney disease.',
   },
   'oncology': {
     title: 'Cancer Care',
     subtitle: 'Comprehensive oncology treatment',
+    description: 'Cancer screening, diagnosis, chemotherapy, and supportive cancer treatment.',
   },
   'icu': {
     title: 'Intensive Care',
     subtitle: 'Critical care services',
+    description: 'Critical care for seriously ill patients requiring constant monitoring.',
   },
   'nutrition-dietetics': {
     title: 'Nutrition',
     subtitle: 'Dietary counseling and planning',
+    description: 'Nutritional counseling and diet planning for various health conditions.',
   },
   'vaccination': {
     title: 'Vaccination',
     subtitle: 'Immunization services',
+    description: 'Immunization programs for children and adults including flu shots and travel vaccines.',
   },
   'blood-bank': {
     title: 'Blood Bank',
     subtitle: 'Blood donation and transfusion',
+    description: 'Blood donation, storage, and transfusion services.',
   },
   'ambulance': {
     title: 'Ambulance',
     subtitle: 'Emergency medical transport',
+    description: 'Emergency medical transportation with trained paramedics.',
   },
   'health-screening': {
     title: 'Health Screening',
     subtitle: 'Preventive health check-ups',
+    description: 'Comprehensive health check-ups and preventive screening programs.',
   },
 };
 
