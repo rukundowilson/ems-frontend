@@ -13,7 +13,7 @@ export default function Navbar() {
           </div>
           <Link href="/services">
             <span className="text-xl font-bold text-gray-900 tracking-tight hover:text-gray-700 cursor-pointer">
-              Hospital Services
+              Our Hospital Services
             </span>
           </Link>
         </div>
