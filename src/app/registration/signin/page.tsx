@@ -1,33 +1,31 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Sign in submitted:', formData);
+    console.log("Sign in submitted:", formData);
     // Handle sign-in logic here
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="">
         <img
-          src="https://images.pexels.com/photos/4254149/pexels-photo-4254149.jpeg"
+          src="/doctor.jpg"
           alt="Woman sitting on sofa making a video call, enjoying a bright day at home - Gustavo Fring on Pexels"
           className="w-full h-full object-cover"
         />
-        {/* Overlay to ensure readability */}
-        <div className="absolute inset-0 bg-white/40 backdrop-blur-sm"></div>
       </div>
 
       {/* Form Container */}
@@ -40,7 +38,7 @@ export default function SignInPage() {
             </h1>
             <div className="text-base text-(--color-text-secondary) space-y-1">
               <p>
-                New here?{' '}
+                New here?{" "}
                 <Link
                   href="/registration/signup"
                   className="text-(--color-purple-primary) hover:text-(--color-purple-hover) font-semibold hover:underline"
@@ -91,7 +89,7 @@ export default function SignInPage() {
                 Password
               </label>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Password"
                 value={formData.password}
@@ -105,7 +103,7 @@ export default function SignInPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-(--color-gray-text) hover:text-(--color-text-primary) transition-colors"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
