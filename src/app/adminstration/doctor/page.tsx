@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function DoctorDashboard() {
@@ -99,7 +100,8 @@ export default function DoctorDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-blue-50 p-8">
+    <div className="min-h-screen bg-gray-100 py-8 px-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -113,7 +115,7 @@ export default function DoctorDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Appointments Chart - Left (2 cols) */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="bg-white rounded-2xl shadow-none p-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">Appointments (Assigned to me)</h2>
                 <div className="flex items-center gap-3">
@@ -147,7 +149,7 @@ export default function DoctorDashboard() {
           </div>
 
           {/* Patient Gender */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="bg-white rounded-2xl shadow-none p-8">
             <h3 className="text-lg font-bold text-gray-800 mb-6">Patient Gender</h3>
             <div className="flex items-center justify-center mb-6">
               <ResponsiveContainer width={140} height={140}>
@@ -176,10 +178,10 @@ export default function DoctorDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Two-day Calendar */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="bg-white rounded-2xl shadow-none p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-bold text-gray-800">Calendar</h2>
-                <span className="text-xs text-gray-500">Showing: Today & Tomorrow</span>
+                <Link href="/adminstration/doctor/calendar" className="text-xs text-teal-600 font-semibold hover:text-teal-700 transition">View All →</Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {(() => {
@@ -212,27 +214,11 @@ export default function DoctorDashboard() {
                             <div className="text-xs text-gray-400">No appointments</div>
                           ) : (
                             apts.map((apt) => (
-                              <div key={apt.id} className="flex items-center justify-between gap-3 p-2 rounded-md hover:shadow-sm transition">
-                                <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-12 text-xs font-bold text-white flex items-center justify-center rounded-md" style={{ background: apt.controlled ? 'linear-gradient(90deg,#bbf7d0,#10b981)' : 'linear-gradient(90deg,#a7f3d0,#06b6d4)' }}>
-                                    {apt.time}
-                                  </div>
-                                  <div className="min-w-0">
-                                    <div className="text-sm font-semibold text-gray-800 truncate">{apt.name}</div>
-                                    <div className="text-xs text-gray-500 truncate">{apt.type}</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <button onClick={() => toggleControlled(apt.id)} className="px-2 py-1 text-xs rounded-full border hover:bg-gray-50">
-                                    {apt.controlled ? 'Mark Pending' : 'Mark Solved'}
-                                  </button>
-                                  <div className="text-xs">
-                                    {apt.controlled ? (
-                                      <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Solved</span>
-                                    ) : (
-                                      <span className="px-2 py-1 text-xs bg-teal-100 text-teal-700 rounded-full">Pending</span>
-                                    )}
-                                  </div>
+                              <div key={apt.id} className="w-full p-3 border-b last:border-b-0 flex items-center gap-3">
+                                <div className="text-xs text-gray-600 w-20 flex-shrink-0">{apt.time}</div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-semibold text-gray-800 truncate">{apt.name}</div>
+                                  <div className="text-xs text-gray-500 truncate">{apt.type}</div>
                                 </div>
                               </div>
                             ))
@@ -247,7 +233,7 @@ export default function DoctorDashboard() {
           </div>
 
           {/* Middle Column - Upcoming Appointments */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="bg-white rounded-2xl shadow-none p-8">
             <h2 className="text-lg font-bold text-gray-800 mb-6">Upcoming Appointment</h2>
               <div className="space-y-3 max-h-96 overflow-y-auto">
               {upcomingAppointmentsState.map((apt) => (
@@ -271,7 +257,7 @@ export default function DoctorDashboard() {
           {/* Right Column - Patient File & Reviews */}
           <div className="space-y-6">
             {/* Patient Files */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="bg-white rounded-2xl shadow-none p-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-gray-800">Patient File</h2>
                 <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-semibold">View All</span>
@@ -290,7 +276,7 @@ export default function DoctorDashboard() {
             </div>
 
             {/* Patient Reviews */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="bg-white rounded-2xl shadow-none p-8">
               <h2 className="text-lg font-bold text-gray-800 mb-6">Patient Feedback</h2>
               <div className="space-y-3">
                 {patientReviews.map((review) => (
@@ -303,6 +289,7 @@ export default function DoctorDashboard() {
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 }
