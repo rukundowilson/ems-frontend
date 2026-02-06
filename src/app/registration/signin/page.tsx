@@ -23,7 +23,7 @@ export default function SignInPage() {
       <div className="">
         <img
           src="/doctor.jpg"
-          alt="Woman sitting on sofa making a video call, enjoying a bright day at home - Gustavo Fring on Pexels"
+          alt="a doctor "
           className="w-full h-full object-cover"
         />
       </div>
