@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Service } from '@/types/services';
 
@@ -166,7 +168,23 @@ export default function AllServicesPage() {
               <Link href="#" className="hover:text-gray-300">Blog</Link>
               <Link href="#" className="hover:text-gray-300">FAQ</Link>
             </div>
+            <Link 
+              href="/dashboard"
+              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-semibold transition-colors"
+            >
+              Back to Dashboard
+            </Link>
           </nav>
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h1 className="text-4xl font-bold mb-3">Our Services</h1>
+          <p className="text-lg text-purple-100">
+            Choose a service to learn more or request an appointment with our healthcare professionals
+          </p>
         </div>
       </div>
 
@@ -175,17 +193,16 @@ export default function AllServicesPage() {
         {/* Grid of service cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allServices.map((service) => (
-            <Link 
+            <div 
               key={service.id} 
-              href={`/services/${service.slug}`}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-200 group"
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-200 group flex flex-col"
             >
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-gray-900 group-hover:text-gray-700">
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors pr-2">
                   {service.title}
                 </h3>
                 <svg 
-                  className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors flex-shrink-0" 
+                  className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors flex-shrink-0" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -193,7 +210,26 @@ export default function AllServicesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-            </Link>
+              
+              <p className="text-sm text-gray-600 mb-4 flex-grow">
+                {service.description}
+              </p>
+
+              <div className="flex gap-2 pt-3 border-t border-gray-100">
+                <Link 
+                  href={`/services/${service.slug}`}
+                  className="flex-1 text-center px-4 py-2 border border-purple-600 text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition-colors text-sm"
+                >
+                  Learn More
+                </Link>
+                <Link
+                  href={`/services/${service.slug}`}
+                  className="flex-1 text-center px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm"
+                >
+                  Request Appointment
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -202,13 +238,24 @@ export default function AllServicesPage() {
       <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-sm font-medium mb-2">We're here to help</p>
-          <h2 className="text-4xl font-bold mb-8">Ready to give us a try?</h2>
-          <Link 
-            href="/services"
-            className="inline-block bg-white text-purple-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors"
-          >
-            Get started →
-          </Link>
+          <h2 className="text-4xl font-bold mb-4">Need help choosing a service?</h2>
+          <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
+            Our healthcare team is available 24/7 to guide you through our services and help you book the right appointment
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Link 
+              href="/dashboard"
+              className="inline-block bg-white text-purple-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors"
+            >
+              Go to Dashboard
+            </Link>
+            <a 
+              href="tel:+250123456789"
+              className="inline-block bg-purple-700 text-white px-8 py-3 rounded-md font-semibold hover:bg-purple-800 transition-colors"
+            >
+              Call Us: +250 123 456 789
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -357,19 +357,38 @@ export default function ServiceBookingPage() {
               </div>
             )}
           </div>
+              {/* Book Button */}
+              <button
+                className="w-full bg-gradient-to-br from-purple-600 to-purple-800 text-white py-4 rounded-lg font-bold text-lg tracking-wide hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!selectedTime}
+                onClick={() => {
+                  if (!selectedTime) return;
 
-          {/* Book Button */}
-          <button
-            className="w-full bg-gradient-to-br from-purple-600 to-purple-800 text-white py-4 rounded-lg font-bold text-lg tracking-wide hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!selectedTime}
-            onClick={() => {
-              if (selectedTime) {
-                alert(`Booking ${service.title} for ${days[selectedDay].dayName} ${days[selectedDay].date} at ${selectedTime}`);
-              }
-            }}
-          >
-            BOOK YOUR SLOT
-          </button>
+                  const newAppointment = {
+                    id: Date.now(),
+                    service: service.title,
+                    date: `${days[selectedDay].dayName} ${days[selectedDay].date}`,
+                    time: selectedTime,
+                    status: 'Pending'
+                  };
+
+                  const existingAppointments = JSON.parse(
+                    localStorage.getItem('appointments') || '[]'
+                  );
+
+                  existingAppointments.push(newAppointment);
+
+                  localStorage.setItem(
+                    'appointments',
+                    JSON.stringify(existingAppointments)
+                  );
+
+                  window.location.href = '/dashboard';
+                }}
+              >
+                BOOK YOUR SLOT
+              </button>
+
         </div>
       </div>
     </div>
