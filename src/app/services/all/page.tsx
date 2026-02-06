@@ -153,7 +153,7 @@ export default function AllServicesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Navigation */}
-      <div className="bg-gray-800 text-white">
+      <div className="bg-gray-800 text-white sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <nav className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-6">

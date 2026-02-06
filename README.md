@@ -2,7 +2,7 @@ The frontend is implemented using Next.js + TypeScript and is responsible for:
 
 Displaying user interfaces:
 
-Homepage
+Homepage 
 
 Event list & details
 
