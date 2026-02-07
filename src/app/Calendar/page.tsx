@@ -140,55 +140,55 @@ const Calendar = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Panel - Disease Info */}
-      <div className="lg:w-2/5 bg-gradient-to-br from-purple-gradient-start to-purple-gradient-end p-8 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-10 max-w-md w-full shadow-xl">
-          <h1 className="text-5xl font-bold text-gray-900 mb-3">Acne</h1>
-          <p className="text-xl text-gray-700">Clearer skin starts today</p>
+      <div className="lg:w-2/5 bg-gradient-to-br from-purple-gradient-start to-purple-gradient-end p-4 sm:p-6 md:p-8 flex items-center justify-center min-h-[200px] lg:min-h-screen">
+        <div className="bg-white rounded-lg p-6 sm:p-8 md:p-10 max-w-md w-full shadow-xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 md:mb-3">Acne</h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-700">Clearer skin starts today</p>
         </div>
       </div>
 
       {/* Right Panel - Booking Interface */}
-      <div className="lg:w-3/5 bg-gray-50 p-8 overflow-y-auto flex items-center justify-center">
+      <div className="lg:w-3/5 bg-gray-50 p-4 sm:p-6 md:p-8 overflow-y-auto flex items-center justify-center">
         {/* Booking Slots Section */}
-        <div className="bg-white rounded-lg p-8 shadow-sm max-w-4xl w-full">
-          <h2 className="text-purple-gradient-start text-sm font-bold tracking-widest mb-2">
+        <div className="bg-white rounded-lg p-4 sm:p-6 md:p-8 shadow-sm max-w-4xl w-full">
+          <h2 className="text-purple-gradient-start text-xs sm:text-sm font-bold tracking-widest mb-2">
             BOOKING SLOTS
           </h2>
-          <p className="text-lg text-gray-900 mb-6">
+          <p className="text-base sm:text-lg text-gray-900 mb-4 sm:mb-6">
             Choose a day and time that works for you.
           </p>
 
           {/* Day Selector */}
-          <div className="grid grid-cols-7 gap-3 mb-8">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-3 mb-6 sm:mb-8">
             {days.map((day) => (
               <button
                 key={day.id}
                 onClick={() => handleDaySelect(day.id)}
-                className={`p-4 rounded-lg text-center transition-all ${
+                className={`p-2 sm:p-3 md:p-4 rounded-lg text-center transition-all ${
                   selectedDay === day.id
                     ? 'bg-gradient-to-br from-purple-gradient-start to-purple-gradient-end text-white shadow-md'
                     : 'bg-white border-2 border-gray-200 text-gray-900 hover:border-purple-gradient-start'
                 }`}
               >
-                <div className="text-xs font-semibold tracking-wider mb-1">
+                <div className="text-[10px] sm:text-xs font-semibold tracking-wider mb-0.5 sm:mb-1">
                   {day.dayName}
                 </div>
-                <div className="text-2xl font-bold">{day.date}</div>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold">{day.date}</div>
               </button>
             ))}
           </div>
 
           {/* Available Times */}
-          <h3 className="text-purple-gradient-start text-sm font-bold tracking-widest mb-4">
+          <h3 className="text-purple-gradient-start text-xs sm:text-sm font-bold tracking-widest mb-3 sm:mb-4">
             AVAILABLE TIMES
           </h3>
-          <div className="grid grid-cols-5 gap-3 mb-8 min-h-[200px]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 mb-6 sm:mb-8 min-h-[150px] sm:min-h-[200px]">
             {currentTimeSlots.length > 0 ? (
               currentTimeSlots.map((slot) => (
                 <button
                   key={slot.id}
                   onClick={() => setSelectedTime(slot.time)}
-                  className={`p-3 rounded border-2 text-sm font-medium tracking-wide transition-all ${
+                  className={`p-2 sm:p-3 rounded border-2 text-xs sm:text-sm font-medium tracking-wide transition-all ${
                     selectedTime === slot.time
                       ? 'bg-gradient-to-br from-purple-gradient-start to-purple-gradient-end text-white border-purple-gradient-start'
                       : 'bg-white border-gray-200 text-gray-900 hover:border-purple-gradient-start'
@@ -198,7 +198,7 @@ const Calendar = () => {
                 </button>
               ))
             ) : (
-              <div className="col-span-5 flex items-center justify-center text-gray-text">
+              <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 flex items-center justify-center text-gray-text text-sm">
                 No available time slots for this day
               </div>
             )}
@@ -206,7 +206,7 @@ const Calendar = () => {
 
           {/* Book Button */}
           <button
-            className="w-full bg-gradient-to-br from-purple-gradient-start to-purple-gradient-end text-white py-4 rounded-lg font-bold text-lg tracking-wide hover:opacity-90 transition-opacity shadow-md"
+            className="w-full bg-gradient-to-br from-purple-gradient-start to-purple-gradient-end text-white py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg tracking-wide hover:opacity-90 transition-opacity shadow-md"
             onClick={() => {
               if (selectedTime) {
                 alert(`Booking slot for ${days[selectedDay].dayName} ${days[selectedDay].date} at ${selectedTime}`);

@@ -39,7 +39,7 @@ export default function Home() {
   ];
 
   const handleGetStarted = () => {
-    router.push('/login');
+    router.push('/services');
   };
 
   return (
@@ -283,7 +283,7 @@ export default function Home() {
               <p className="text-lg text-gray-600 mb-6">
                 Online care is growing and so is our list of services and conditions.
               </p>
-              <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">
+              <a href="/services/all" className="text-purple-600 hover:text-purple-700 font-medium">
                 Our Services →
               </a>
             </div>
