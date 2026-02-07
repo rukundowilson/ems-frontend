@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ServiceCard from '@/components/ServiceCard';
+import ServiceCard from '@/app/components/ServiceCard';
 import { Service } from '@/types/services';
 
 // Main hospital services

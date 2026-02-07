@@ -1,1 +1,0 @@
-export { ClinicProvider, useClinic } from './ClinicContext';
