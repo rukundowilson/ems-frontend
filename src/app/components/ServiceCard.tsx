@@ -7,7 +7,7 @@ interface ServiceCardProps {
 
 export default function ServiceCard({ service }: ServiceCardProps) {
   return (
-    <Link href={`/services/${service.slug}`}>
+    <Link href={`/get-started/book?service=${service.slug}`}>
       <div
         className="
           bg-white

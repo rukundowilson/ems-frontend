@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import api from '../../shared/services/axios';
 import Link from 'next/link';
 import { HelpCircle } from 'lucide-react';
@@ -19,6 +20,9 @@ const US_STATES = [
 const SUFFIXES = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
   const [formData, setFormData] = useState({
     firstName: '',
     middleInitial: '',
@@ -82,9 +86,17 @@ export default function SignUpPage() {
           console.log('Signup response', res.data);
           // store JWT token
           if (res.data.token) {
-            localStorage.setItem('authToken', res.data.token);
+            localStorage.setItem('auth_token', res.data.token);
+            localStorage.setItem('user_role', 'patient');
+            localStorage.setItem('user_data', JSON.stringify(res.data.data));
             console.log('Signup successful, token stored');
-            // TODO: navigate to dashboard or home
+            
+            // Redirect to specified URL or dashboard
+            if (redirectUrl) {
+              router.push(redirectUrl);
+            } else {
+              router.push('/get-started');
+            }
           }
         } catch (err: any) {
           console.error('Signup failed', err);

@@ -56,7 +56,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-white">
       {/* CTA Section */}
-      <div className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 py-16 px-6">
+      <div className="w-full bg-purple-600 py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-white text-sm font-semibold uppercase tracking-wide mb-3">
             We're here to help

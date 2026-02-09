@@ -1,6 +1,7 @@
 "use client"
 import React from 'react';
 import { Check, Star } from 'lucide-react';
+import Link from 'next/link';
 import PhoneMockup from './PhoneMockup';
 
 interface Review {
@@ -72,10 +73,10 @@ const VirtuwellHero: React.FC = () => {
 
             {/* CTA Button */}
             <div>
-              <button className="btn-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center gap-3">
+              <Link href="/get-started" className="btn-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center gap-3 inline-block text-center">
                 Get started
                 <span className="text-2xl">›</span>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

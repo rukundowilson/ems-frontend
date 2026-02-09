@@ -1,10 +1,74 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LogOut } from 'lucide-react';
+
+interface DoctorUser {
+  _id: string;
+  email: string;
+  name: string;
+  phone: string;
+  role: string;
+}
+
+const initialAppointments = [
+  { id: 1, name: 'Linda Brown', time: '08:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 2, name: 'Nelly Dean', time: '09:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 3, name: 'John Doe', time: '10:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: true, date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 4, name: 'James Vane', time: '10:45 AM', type: 'First call', status: 'inactive', assignedTo: 'other', controlled: true, date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 5, name: 'Mary Smith', time: '11:00 AM', type: 'Consultation', status: 'inactive', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 6, name: 'Alex Roe', time: '02:00 PM', type: 'Follow-up', status: 'active', assignedTo: 'me', controlled: true, date: new Date().toISOString() },
+];
 
 export default function DoctorDashboard() {
+  const router = useRouter();
+  const [doctorData, setDoctorData] = useState<DoctorUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [upcomingAppointmentsState, setUpcomingAppointmentsState] = useState(initialAppointments);
+  const [view, setView] = useState<'day' | 'week'>('day');
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    const role = localStorage.getItem('user_role');
+    const userData = localStorage.getItem('user_data');
+
+    if (!token || role !== 'doctor') {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (userData) {
+      setDoctorData(JSON.parse(userData));
+    }
+    setLoading(false);
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_data');
+    router.push('/auth/signin');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!doctorData) {
+    return null;
+  }
+
   // Data
   const dutyHourData = [
     { day: 'Sat', hours: 9 },
@@ -22,23 +86,9 @@ export default function DoctorDashboard() {
   ];
 
   // sample appointments with dates (ISO) to allow aggregation by day/week
-  const initialAppointments = [
-    { id: 1, name: 'Linda Brown', time: '08:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 2, name: 'Nelly Dean', time: '09:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 3, name: 'John Doe', time: '10:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: true, date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 4, name: 'James Vane', time: '10:45 AM', type: 'First call', status: 'inactive', assignedTo: 'other', controlled: true, date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 5, name: 'Mary Smith', time: '11:00 AM', type: 'Consultation', status: 'inactive', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: 6, name: 'Alex Roe', time: '02:00 PM', type: 'Follow-up', status: 'active', assignedTo: 'me', controlled: true, date: new Date().toISOString() },
-  ];
-
-  const [upcomingAppointmentsState, setUpcomingAppointmentsState] = React.useState(initialAppointments);
-
   function toggleControlled(id: number) {
     setUpcomingAppointmentsState((prev) => prev.map((a) => (a.id === id ? { ...a, controlled: !a.controlled } : a)));
   }
-
-  // UI state: 'day' shows last 7 days, 'week' shows last 4 weeks
-  const [view, setView] = React.useState<'day' | 'week'>('day');
 
   function startOfDay(d: Date) {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -105,10 +155,38 @@ export default function DoctorDashboard() {
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Hello James!</h1>
-            <p className="text-gray-600 text-sm max-w-md">Welcome James to Our Platform. Let's help patients to live a healthier and happier life</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Hello {doctorData.name}!</h1>
+            <p className="text-gray-600 text-sm max-w-md">Welcome to Your Dashboard. Let's help patients to live a healthier and happier life</p>
           </div>
-          <button className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-600 transition font-bold text-lg">+</button>
+          <div className="flex items-center gap-4">
+            <button className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-600 transition font-bold text-lg">+</button>
+            <div className="relative">
+              <button
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:shadow-md transition"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                  {doctorData.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-semibold text-gray-800 hidden sm:inline">{doctorData.name}</span>
+              </button>
+              {profileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="p-3 border-b text-sm">
+                    <p className="font-semibold text-gray-900">{doctorData.name}</p>
+                    <p className="text-xs text-gray-600">{doctorData.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 text-sm font-semibold transition"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Top Section - 3 columns */}
