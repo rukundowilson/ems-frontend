@@ -68,6 +68,34 @@ export default function PatientDashboard() {
 
   const [activeTab, setActiveTab] = useState<'overview' | 'appointments' | 'prescriptions' | 'profile'>('overview');
 
+  useEffect(() => {
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    setUpcomingAppointments(appointments);
+  }, []);
+
+  const handleConfirmAppointment = (appointmentId: number) => {
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    const updated = appointments.map((apt: any) => 
+      apt.id === appointmentId ? { ...apt, status: 'Confirmed' } : apt
+    );
+    localStorage.setItem('appointments', JSON.stringify(updated));
+    setUpcomingAppointments(updated);
+  };
+
+  const handleCancelAppointment = (appointmentId: number) => {
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    const updated = appointments.filter((apt: any) => apt.id !== appointmentId);
+    localStorage.setItem('appointments', JSON.stringify(updated));
+    setUpcomingAppointments(updated);
+  };
+
+  const handleClearAll = () => {
+    if (confirm('Clear all appointments?')) {
+      localStorage.removeItem('appointments');
+      setUpcomingAppointments([]);
+    }
+  };
+
   const handleRequestAppointment = () => {
     router.push('/services/all');
   };
@@ -232,44 +260,40 @@ export default function PatientDashboard() {
                 <h2 className="text-xl font-bold text-gray-900">Upcoming Appointments</h2>
               </div>
               <div className="p-6 space-y-4">
-                {upcomingAppointments.map((apt) => (
-                  <div key={apt.id} className="border-l-4 border-purple-600 bg-gray-50 p-4 rounded-r-lg">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-bold text-gray-900 mb-1">{apt.service}</h3>
-                        <p className="text-sm text-gray-600 mb-2">{apt.doctor}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {apt.date}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {apt.time}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {apt.location}
-                          </span>
+                {upcomingAppointments.length > 0 ? (
+                  upcomingAppointments.map((apt) => (
+                    <div key={apt.id} className="border-l-4 border-purple-600 bg-gray-50 p-4 rounded-r-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-gray-900 mb-1">{apt.service}</h3>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              {apt.date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {apt.time}
+                            </span>
+                          </div>
                         </div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          apt.status === 'Confirmed' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {apt.status}
+                        </span>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        apt.status === 'Confirmed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {apt.status}
-                      </span>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No upcoming appointments</p>
+                )}
                 <button
                   onClick={handleRequestAppointment}
                   className="block w-full text-center text-purple-600 hover:text-purple-700 font-semibold py-2 hover:bg-purple-50 rounded-lg transition-colors"
@@ -312,55 +336,72 @@ export default function PatientDashboard() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200 flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-900">Upcoming Appointments</h2>
-                <button
-                  onClick={handleRequestAppointment}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-                >
-                  Request New
-                </button>
+                <div className="flex gap-2">
+                  {upcomingAppointments.length > 0 && (
+                    <button
+                      onClick={handleClearAll}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors text-sm"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                  <button
+                    onClick={handleRequestAppointment}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                  >
+                    Request New
+                  </button>
+                </div>
               </div>
               <div className="divide-y divide-gray-200">
-                {upcomingAppointments.map((apt) => (
-                  <div key={apt.id} className="p-6 hover:bg-gray-50 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-bold text-lg text-gray-900">{apt.service}</h3>
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            apt.status === 'Confirmed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {apt.status}
-                          </span>
-                        </div>
-                        <p className="text-gray-600 mb-3">{apt.doctor}</p>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-500 text-xs mb-1">Date</p>
-                            <p className="font-medium text-gray-900">{apt.date}</p>
+                {upcomingAppointments.length > 0 ? (
+                  upcomingAppointments.map((apt) => (
+                    <div key={apt.id} className="p-6 hover:bg-gray-50 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-bold text-lg text-gray-900">{apt.service}</h3>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              apt.status === 'Confirmed' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {apt.status}
+                            </span>
                           </div>
-                          <div>
-                            <p className="text-gray-500 text-xs mb-1">Time</p>
-                            <p className="font-medium text-gray-900">{apt.time}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs mb-1">Location</p>
-                            <p className="font-medium text-gray-900">{apt.location}</p>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <p className="text-gray-500 text-xs mb-1">Date</p>
+                              <p className="font-medium text-gray-900">{apt.date}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs mb-1">Time</p>
+                              <p className="font-medium text-gray-900">{apt.time}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="text-purple-600 hover:text-purple-700 px-3 py-1 rounded border border-purple-600 hover:bg-purple-50 transition-colors text-sm font-medium">
-                          Reschedule
-                        </button>
-                        <button className="text-red-600 hover:text-red-700 px-3 py-1 rounded border border-red-600 hover:bg-red-50 transition-colors text-sm font-medium">
-                          Cancel
-                        </button>
+                        <div className="flex gap-2">
+                          {apt.status === 'Pending' && (
+                            <button 
+                              onClick={() => handleConfirmAppointment(apt.id)}
+                              className="text-green-600 hover:text-green-700 px-3 py-1 rounded border border-green-600 hover:bg-green-50 transition-colors text-sm font-medium"
+                            >
+                              Confirm
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleCancelAppointment(apt.id)}
+                            className="text-red-600 hover:text-red-700 px-3 py-1 rounded border border-red-600 hover:bg-red-50 transition-colors text-sm font-medium"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="p-6 text-center text-gray-500">No upcoming appointments</div>
+                )}
               </div>
             </div>
 
