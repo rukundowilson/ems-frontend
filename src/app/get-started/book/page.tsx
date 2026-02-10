@@ -8,6 +8,8 @@ import Header from '@/app/components/Header';
 interface TimeSlot {
   id: string;
   time: string;
+  startTime: string;
+  endTime: string;
   isAvailable: boolean;
 }
 
@@ -33,7 +35,6 @@ const CalendarContent = () => {
   const serviceSlug = searchParams.get('service');
   const doctorId = searchParams.get('doctorId') || 'doctor-1';
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number>(0);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -59,25 +60,20 @@ const CalendarContent = () => {
 
   const selectedService = serviceSlug ? serviceMap[serviceSlug] || serviceSlug : 'Service';
 
-  // Check authentication status
+  // Restore any pending booking context (no login required)
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const token = localStorage.getItem('auth_token');
-    setIsAuthenticated(!!token);
     setCheckedAuth(true);
 
-    // If authenticated, restore booking context if it exists
-    if (token) {
-      const bookingContext = localStorage.getItem('booking_context');
-      if (bookingContext) {
-        try {
-          const context = JSON.parse(bookingContext);
-          if (context.selectedDay !== undefined) setSelectedDay(context.selectedDay);
-          if (context.selectedTime) setSelectedTime(context.selectedTime);
-          localStorage.removeItem('booking_context');
-        } catch (e) {
-          // ignore
-        }
+    const bookingContext = localStorage.getItem('booking_context');
+    if (bookingContext) {
+      try {
+        const context = JSON.parse(bookingContext);
+        if (context.selectedDay !== undefined) setSelectedDay(context.selectedDay);
+        if (context.selectedTime) setSelectedTime(context.selectedTime);
+        localStorage.removeItem('booking_context');
+      } catch (e) {
+        // ignore
       }
     }
   }, []);
@@ -113,31 +109,19 @@ const CalendarContent = () => {
     });
   };
 
-  // Parse time between start and end into 30-min slots
+  // Convert full time range to display format
   const parseTimeSlots = (start: string, end: string): TimeSlot[] => {
-    const slots: TimeSlot[] = [];
-    const [startHour, startMin] = start.split(':').map(Number);
-    const [endHour, endMin] = end.split(':').map(Number);
-
-    let currentHour = startHour;
-    let currentMin = startMin;
-
-    while (currentHour < endHour || (currentHour === endHour && currentMin < endMin)) {
-      const timeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`;
-      slots.push({
-        id: timeStr,
-        time: formatTime(timeStr),
-        isAvailable: true,
-      });
-
-      currentMin += 30;
-      if (currentMin >= 60) {
-        currentMin = 0;
-        currentHour += 1;
-      }
-    }
-
-    return slots;
+    const displayStart = formatTime(start);
+    const displayEnd = formatTime(end);
+    const displayTime = `${displayStart} - ${displayEnd}`;
+    
+    return [{
+      id: `${start}-${end}`,
+      time: displayTime,
+      startTime: start,
+      endTime: end,
+      isAvailable: true,
+    }];
   };
 
   // Convert 24h to 12h format
@@ -209,20 +193,12 @@ const CalendarContent = () => {
 
   // Handle day selection - clear selected time when day changes
   const handleDaySelect = (dayId: number) => {
-    if (!isAuthenticated) {
-      saveBookingContext();
-      return;
-    }
     setSelectedDay(dayId);
     setSelectedTime(null);
   };
 
   // Handle time selection
   const handleTimeSelect = (time: string) => {
-    if (!isAuthenticated) {
-      saveBookingContext();
-      return;
-    }
     setSelectedTime(time);
   };
 
@@ -234,12 +210,15 @@ const CalendarContent = () => {
     }
 
     // Store booking data and redirect to confirmation
+    const selectedSlot = currentTimeSlots.find(slot => slot.time === selectedTime);
     const bookingData = {
       doctorId,
       service: selectedService,
       serviceSlug: serviceSlug,
       date: days[selectedDay].dateString,
       time: selectedTime,
+      startTime: selectedSlot?.startTime,
+      endTime: selectedSlot?.endTime,
       dayName: days[selectedDay].dayName,
       dayDate: days[selectedDay].date,
     };
@@ -256,53 +235,7 @@ const CalendarContent = () => {
     );
   }
 
-  // Show authentication modal if not logged in
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Login Required</h2>
-            <p className="text-gray-600">You must be logged in to continue with your booking for <span className="font-semibold">{selectedService}</span></p>
-          </div>
-
-          <div className="space-y-4">
-            <Link
-              href={`/auth/signin?redirect=/get-started/book?service=${serviceSlug}&doctorId=${doctorId}`}
-              className="block w-full bg-gradient-to-r from-purple-600 to-purple-800 text-white font-bold py-3 rounded-lg text-center hover:from-purple-700 hover:to-purple-900 transition-all shadow-lg"
-            >
-              Sign In
-            </Link>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or</span>
-              </div>
-            </div>
-
-            <Link
-              href={`/auth/signup?redirect=/get-started/book?service=${serviceSlug}&doctorId=${doctorId}`}
-              className="block w-full bg-white border-2 border-purple-600 text-purple-600 font-bold py-3 rounded-lg text-center hover:bg-purple-50 transition-all"
-            >
-              Create Account
-            </Link>
-          </div>
-
-          <p className="text-center text-gray-600 text-sm mt-6">
-            Your booking details will be preserved after you sign in
-          </p>
-        </div>
-      </div>
-    );
-  }
+  
 
   if (loading) {
     return (
@@ -322,7 +255,7 @@ const CalendarContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <Header/>
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
         {/* Left Panel - Disease Info */}
