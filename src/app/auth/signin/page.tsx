@@ -59,8 +59,6 @@ export default function SignInPage() {
         router.push(redirectUrl);
       } else if (detectedRole === "doctor") {
         router.push("/adminstration/doctor");
-      } else if (detectedRole === "admin") {
-        router.push("/adminstration/admin/dashboard");
       } else {
         router.push("/get-started");
       }

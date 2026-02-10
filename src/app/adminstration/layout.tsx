@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Briefcase, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Calendar, Briefcase, UserCog, Settings, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({
@@ -24,7 +24,8 @@ export default function AdminLayout({
       const parsed = JSON.parse(raw);
       setUser(parsed || null);
     } catch (e) {
-      // ignore
+      console.error('Invalid user_data in localStorage, clearing it');
+      localStorage.removeItem('user_data');
     }
   }, []);
 
@@ -35,7 +36,7 @@ export default function AdminLayout({
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : 'M';
+    : 'A';
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -63,6 +64,9 @@ export default function AdminLayout({
           </Link>
           <Link href="/adminstration/admin/services" className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === '/adminstration/admin/services' ? 'bg-teal-500' : 'bg-blue-600 hover:bg-blue-500'}`} title="Services Management">
             <Briefcase className="w-6 h-6 text-white" />
+          </Link>
+          <Link href="/adminstration/admin/doctors" className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === '/adminstration/admin/doctors' ? 'bg-teal-500' : 'bg-blue-600 hover:bg-blue-500'}`} title="Doctors">
+            <UserCog className="w-6 h-6 text-white" />
           </Link>
           <button className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-500 transition" title="Settings">
             <Settings className="w-6 h-6 text-white" />

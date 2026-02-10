@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Calendar, Users, CheckCircle, Clock } from 'lucide-react';
+import { Calendar, Users, CheckCircle, Clock, UserCog } from 'lucide-react';
 import api from '@/app/shared/services/axios';
 
 export default function AdminDashboard() {
@@ -10,6 +10,7 @@ export default function AdminDashboard() {
     pendingAppointments: 0,
     completedAppointments: 0,
     totalServices: 0,
+    totalDoctors: 0,
   });
   const [chartData, setChartData] = useState<any[]>([]);
   const [genderData, setGenderData] = useState({ male: 0, female: 0 });
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
         pendingAppointments: 12,
         completedAppointments: 33,
         totalServices: 8,
+        totalDoctors: 6,
       });
       
       setChartData([
@@ -73,20 +75,20 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Completed</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{stats.completedAppointments}</p>
+              <p className="text-gray-500 text-sm">Total Services</p>
+              <p className="text-3xl font-bold text-purple-600 mt-2">{stats.totalServices}</p>
             </div>
-            <CheckCircle className="w-10 h-10 text-green-500" />
+            <Users className="w-10 h-10 text-purple-500" />
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Total Services</p>
-              <p className="text-3xl font-bold text-purple-600 mt-2">{stats.totalServices}</p>
+              <p className="text-gray-500 text-sm">Total Doctors</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{stats.totalDoctors}</p>
             </div>
-            <Users className="w-10 h-10 text-purple-500" />
+            <UserCog className="w-10 h-10 text-green-500" />
           </div>
         </div>
       </div>
@@ -156,7 +158,7 @@ export default function AdminDashboard() {
                   fill="none" 
                   stroke="#06b6d4" 
                   strokeWidth="20"
-                  strokeDasharray={`${(genderData.male / (genderData.male + genderData.female)) * 251.2} 251.2`}
+                  strokeDasharray="200 251.2"
                 />
                 <circle 
                   cx="50" 
@@ -165,8 +167,8 @@ export default function AdminDashboard() {
                   fill="none" 
                   stroke="#93c5fd" 
                   strokeWidth="20"
-                  strokeDasharray={`${(genderData.female / (genderData.male + genderData.female)) * 251.2} 251.2`}
-                  strokeDashoffset={`-${(genderData.male / (genderData.male + genderData.female)) * 251.2}`}
+                  strokeDasharray="51.2 251.2"
+                  strokeDashoffset="-200"
                 />
               </svg>
             </div>
