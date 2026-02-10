@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import api from '../../shared/services/axios';
 import Link from 'next/link';
@@ -19,7 +19,7 @@ const US_STATES = [
 
 const SUFFIXES = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
 
-export default function SignUpPage() {
+function SignUpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect');
@@ -490,5 +490,13 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-lg text-gray-600">Loading...</div></div>}>
+      <SignUpContent />
+    </Suspense>
   );
 }

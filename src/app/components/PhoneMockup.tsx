@@ -61,7 +61,7 @@ const PhoneMockup: React.FC = () => {
               <svg className="w-3 h-3 text-gray-400" viewBox="0 0 12 12" fill="none">
                 <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.5"/>
               </svg>
-              <span className="text-xs text-gray-600 font-medium">virtuwell.com</span>
+              <span className="text-xs text-gray-600 font-medium">ems.com</span>
             </div>
           </div>
 
@@ -70,7 +70,7 @@ const PhoneMockup: React.FC = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-purple-600 via-purple-500 to-teal-400 rounded-lg flex items-center justify-center shadow-sm">
               <div className="w-6 h-6 border-2 border-white/40 rounded-sm transform rotate-45"></div>
             </div>
-            <span className="text-lg font-bold text-gray-900">virtuwell</span>
+            <span className="text-lg font-bold text-gray-900">EMS</span>
           </div>
 
           {/* Main Content */}

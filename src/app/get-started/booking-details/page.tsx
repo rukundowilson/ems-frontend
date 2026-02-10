@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import Header from '@/app/components/Header';
 
 interface BookingData {
   doctorId: string;
@@ -190,6 +191,21 @@ export default function BookingDetailsPage() {
 
       const result = await response.json();
 
+      // Store booking success data for receipt
+      const successData = {
+        appointmentId: result.data._id,
+        service: booking.service,
+        date: booking.date,
+        time: booking.time,
+        dayName: booking.dayName,
+        doctorId: booking.doctorId,
+        patientEmail: formData.email,
+        patientPhone: formData.phone,
+        amount: PRICE,
+      };
+
+      localStorage.setItem('booking_success_data', JSON.stringify(successData));
+
       // Clear pending booking
       localStorage.removeItem('pending_booking');
       localStorage.removeItem('booking_context');
@@ -223,8 +239,9 @@ export default function BookingDetailsPage() {
   }[booking.paymentMethod] || 'Unknown';
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-100">
+      <Header/>
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -241,7 +258,7 @@ export default function BookingDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+            <form onSubmit={handleSubmit} className="bg-white rounded-md shadow-sm p-8">
               {/* Contact Information */}
               <div className="mb-8">
                 <h2 className="text-lg font-bold text-gray-900 mb-6">Contact Information</h2>
@@ -397,7 +414,7 @@ export default function BookingDetailsPage() {
                 className={`w-full mt-8 py-4 rounded-lg font-bold text-white transition-all ${
                   submitting
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900'
+                    : 'bg-blue-500 hover:bg-blue-500 hover:cursor-pointer'
                 }`}
               >
                 {submitting ? 'Processing...' : 'Complete Booking'}
@@ -411,7 +428,7 @@ export default function BookingDetailsPage() {
 
           {/* Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-8 sticky top-8">
+            <div className="bg-white rounded-sm shadow-sm p-8 sticky top-8">
               <h3 className="text-lg font-bold text-gray-900 mb-6">Booking Summary</h3>
 
               <div className="space-y-4 mb-6">
@@ -453,6 +470,7 @@ export default function BookingDetailsPage() {
           </div>
         </div>
       </div>
+      <br />
     </div>
   );
 }
