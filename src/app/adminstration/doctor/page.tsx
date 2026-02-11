@@ -12,24 +12,45 @@ interface DoctorUser {
   name: string;
   phone: string;
   role: string;
+  services?: string[];
 }
 
-const initialAppointments = [
-  { id: 1, name: 'Linda Brown', time: '08:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 2, name: 'Nelly Dean', time: '09:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 3, name: 'John Doe', time: '10:00 AM', type: 'First call', status: 'active', assignedTo: 'me', controlled: true, date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 4, name: 'James Vane', time: '10:45 AM', type: 'First call', status: 'inactive', assignedTo: 'other', controlled: true, date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 5, name: 'Mary Smith', time: '11:00 AM', type: 'Consultation', status: 'inactive', assignedTo: 'me', controlled: false, date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 6, name: 'Alex Roe', time: '02:00 PM', type: 'Follow-up', status: 'active', assignedTo: 'me', controlled: true, date: new Date().toISOString() },
-];
+interface Booking {
+  _id: string;
+  patientName: string;
+  patientEmail: string;
+  doctorId: string;
+  service: string;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  status?: string;
+}
+
+// Convert booking to appointment display format
+function convertBookingToAppointment(booking: Booking, index: number) {
+  return {
+    id: String(booking._id ?? index),
+    bookingId: String(booking._id ?? ''),
+    name: booking.patientName || 'Patient',
+    time: booking.startTime || '00:00',
+    type: booking.service || 'Appointment',
+    status: booking.status === 'completed' ? 'inactive' : 'active',
+    assignedTo: 'me',
+    controlled: booking.status === 'completed',
+    date: booking.bookingDate || new Date().toISOString(),
+  };
+}
 
 export default function DoctorDashboard() {
   const router = useRouter();
   const [doctorData, setDoctorData] = useState<DoctorUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [upcomingAppointmentsState, setUpcomingAppointmentsState] = useState(initialAppointments);
+  const [upcomingAppointmentsState, setUpcomingAppointmentsState] = useState<any[]>([]);
   const [view, setView] = useState<'day' | 'week'>('day');
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [doctorServices, setDoctorServices] = useState<string[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -42,10 +63,66 @@ export default function DoctorDashboard() {
     }
 
     if (userData) {
-      setDoctorData(JSON.parse(userData));
+      try {
+        const parsedDoctor = JSON.parse(userData) as DoctorUser;
+        setDoctorData(parsedDoctor);
+        
+        // Set doctor's assigned services
+        if (parsedDoctor.services && Array.isArray(parsedDoctor.services)) {
+          setDoctorServices(parsedDoctor.services);
+          // Set first service as default filter
+          if (parsedDoctor.services.length > 0) {
+            setSelectedService(parsedDoctor.services[0]);
+          }
+        }
+        
+        // Fetch all appointments without filtering by doctorId, filter by service on client
+        fetchAllAppointments(token);
+      } catch (err) {
+        console.error('Failed to parse doctor data:', err);
+        setUpcomingAppointmentsState([]);
+      }
     }
     setLoading(false);
   }, [router]);
+
+  const fetchAllAppointments = async (token: string) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/bookings', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(`Failed to fetch appointments: ${response.status}`);
+        setUpcomingAppointmentsState([]);
+        return;
+      }
+
+      const responseData = await response.json();
+      const bookings: Booking[] = responseData.data || [];
+      const appointments = bookings.map((booking, index) =>
+        convertBookingToAppointment(booking, index)
+      );
+      setUpcomingAppointmentsState(appointments);
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setUpcomingAppointmentsState([]);
+    }
+  };
+
+  // Filter appointments to only show services doctor is assigned to
+  const appointmentsForDoctorServices = upcomingAppointmentsState.filter((apt: any) => 
+    doctorServices.length === 0 || doctorServices.includes(apt.type)
+  );
+  
+  // Further filter by selected service
+  const filteredAppointments = selectedService 
+    ? appointmentsForDoctorServices.filter((apt: any) => apt.type === selectedService)
+    : appointmentsForDoctorServices;
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
@@ -87,7 +164,7 @@ export default function DoctorDashboard() {
 
   // sample appointments with dates (ISO) to allow aggregation by day/week
   function toggleControlled(id: number) {
-    setUpcomingAppointmentsState((prev) => prev.map((a) => (a.id === id ? { ...a, controlled: !a.controlled } : a)));
+    setUpcomingAppointmentsState((prev: any[]) => prev.map((a: any) => (a.id === id ? { ...a, controlled: !a.controlled } : a)));
   }
 
   function startOfDay(d: Date) {
@@ -106,11 +183,11 @@ export default function DoctorDashboard() {
       const d = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
       const start = startOfDay(d).getTime();
       const end = start + 24 * 60 * 60 * 1000;
-      const slice = apts.filter((a) => {
+      const slice = apts.filter((a: any) => {
         const t = new Date(a.date).getTime();
         return t >= start && t < end && a.assignedTo === 'me';
       });
-      result.push({ name: formatDayLabel(d), pending: slice.filter((s) => !s.controlled).length, solved: slice.filter((s) => s.controlled).length });
+      result.push({ name: formatDayLabel(d), pending: slice.filter((s: any) => !s.controlled).length, solved: slice.filter((s: any) => s.controlled).length });
     }
     return result;
   }
@@ -122,17 +199,17 @@ export default function DoctorDashboard() {
     for (let w = weeks - 1; w >= 0; w--) {
       const end = today.getTime() - w * 7 * 24 * 60 * 60 * 1000 + 24 * 60 * 60 * 1000; // inclusive end
       const start = end - 7 * 24 * 60 * 60 * 1000;
-      const slice = apts.filter((a) => {
+      const slice = apts.filter((a: any) => {
         const t = new Date(a.date).getTime();
         return t >= start && t < end && a.assignedTo === 'me';
       });
       const weekLabel = new Date(start).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' }) + ' - ' + new Date(end - 1).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' });
-      result.push({ name: weekLabel, pending: slice.filter((s) => !s.controlled).length, solved: slice.filter((s) => s.controlled).length });
+      result.push({ name: weekLabel, pending: slice.filter((s: any) => !s.controlled).length, solved: slice.filter((s: any) => s.controlled).length });
     }
     return result;
   }
 
-  const chartData = view === 'day' ? aggregateByDay(upcomingAppointmentsState, 7) : aggregateByWeek(upcomingAppointmentsState, 4);
+  const chartData = view === 'day' ? aggregateByDay(appointmentsForDoctorServices, 7) : aggregateByWeek(appointmentsForDoctorServices, 4);
   const totalPending = chartData.reduce((sum, r) => sum + r.pending, 0);
   const totalSolved = chartData.reduce((sum, r) => sum + r.solved, 0);
 
@@ -267,13 +344,13 @@ export default function DoctorDashboard() {
                   function getAppointmentsForDay(d: Date) {
                     const start = startOfDay(d).getTime();
                     const end = start + 24 * 60 * 60 * 1000;
-                                    return upcomingAppointmentsState
-                      .filter((a) => a.assignedTo === 'me')
-                      .filter((a) => {
+                    return appointmentsForDoctorServices
+                      .filter((a: any) => a.assignedTo === 'me')
+                      .filter((a: any) => {
                         const t = new Date(a.date).getTime();
                         return t >= start && t < end;
                       })
-                      .sort((x, y) => new Date(x.date).getTime() - new Date(y.date).getTime());
+                      .sort((x: any, y: any) => new Date(x.date).getTime() - new Date(y.date).getTime());
                   }
 
                   return days.map((day) => {
@@ -291,12 +368,17 @@ export default function DoctorDashboard() {
                           {apts.length === 0 ? (
                             <div className="text-xs text-gray-400">No appointments</div>
                           ) : (
-                            apts.map((apt) => (
-                              <div key={apt.id} className="w-full p-3 border-b last:border-b-0 flex items-center gap-3">
-                                <div className="text-xs text-gray-600 w-20 flex-shrink-0">{apt.time}</div>
+                            apts.map((apt: any) => (
+                              <div key={apt.id} onClick={() => router.push(`/adminstration/doctor/booking/${apt.bookingId}`)} className="w-full p-3 border-b last:border-b-0 flex items-center gap-3 cursor-pointer">
+                                <div className="text-xs text-gray-600 w-14 flex-shrink-0">{apt.time}</div>
                                 <div className="flex-1 min-w-0">
                                   <div className="text-sm font-semibold text-gray-800 truncate">{apt.name}</div>
-                                  <div className="text-xs text-gray-500 truncate">{apt.type}</div>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-xs text-gray-500 truncate">{apt.type}</span>
+                                    <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono flex-shrink-0">
+                                      {apt.bookingId ? String(apt.bookingId).substring(0, 6) : apt.id}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             ))
@@ -310,25 +392,61 @@ export default function DoctorDashboard() {
             </div>
           </div>
 
-          {/* Middle Column - Upcoming Appointments */}
+          {/* Middle Column - All Appointments */}
           <div className="bg-white rounded-2xl shadow-none p-8">
-            <h2 className="text-lg font-bold text-gray-800 mb-6">Upcoming Appointment</h2>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-              {upcomingAppointmentsState.map((apt) => (
-                <div key={apt.id} className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition">
-                  <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white ${apt.status === 'active' ? 'bg-gradient-to-br from-teal-400 to-teal-500' : 'bg-gray-300'}`}>
-                    {apt.name.split(' ')[0][0]}{apt.name.split(' ')[1][0]}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-gray-800">All Appointments</h2>
+              <span className="text-xs text-gray-500">Total: {filteredAppointments.length}</span>
+            </div>
+            
+            {/* Service Filter - Only show services doctor is assigned to */}
+            <div className="mb-4 flex flex-wrap gap-2">
+              {doctorServices.length > 0 ? (
+                <>
+                  {doctorServices.map((service: any) => (
+                    <button
+                      key={service}
+                      onClick={() => setSelectedService(service)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                        selectedService === service
+                          ? 'bg-teal-500 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {service}
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <div className="text-xs text-gray-500">No services assigned</div>
+              )}
+            </div>
+            
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {filteredAppointments.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No appointments</div>
+              ) : (
+                filteredAppointments.map((apt: any) => (
+                  <div key={apt.id} onClick={() => router.push(`/adminstration/doctor/booking/${apt.bookingId}`)} className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition cursor-pointer">
+                    <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white ${apt.status === 'active' ? 'bg-gradient-to-br from-teal-400 to-teal-500' : 'bg-gray-300'}`}>
+                      {apt.name.split(' ')[0][0]}{apt.name.split(' ')[1] ? apt.name.split(' ')[1][0] : ''}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm">{apt.name}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-xs text-gray-500">{apt.type}</p>
+                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded font-mono">
+                          ID: {apt.bookingId ? String(apt.bookingId).substring(0, 8) : apt.id}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`w-3 h-3 rounded-full ${apt.status === 'active' ? 'bg-teal-500' : 'bg-gray-300'}`}></span>
+                      <span className="text-teal-600 font-semibold text-xs whitespace-nowrap">{apt.time}</span>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-sm">{apt.name}</p>
-                    <p className="text-xs text-gray-500">{apt.type}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${apt.status === 'active' ? 'bg-teal-500' : 'bg-gray-300'}`}></span>
-                    <span className="text-teal-600 font-semibold text-xs whitespace-nowrap">{apt.time}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

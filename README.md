@@ -21,3 +21,5 @@ Integrating Firebase Authentication for secure login/registration
 Displaying notifications and error messages
 
 Managing application state (e.g., selected event, booked slots)
+
+example of receit #698b7f972b8ce9efd1fa5fb6

@@ -165,7 +165,12 @@ function BookingSuccessContent() {
             <div className="text-right">
               <div className="text-sm font-bold text-gray-900">APPOINTMENT RECEIPT</div>
               <div className="text-xs text-gray-500">Date: {new Date().toLocaleDateString()}</div>
-              <div className="text-xs text-gray-500">Appointment ID: {bookingId}</div>
+              <div className="text-xs text-gray-500 flex items-center justify-end gap-2">
+                <span>Appointment ID: {bookingId}</span>
+                <button onClick={handleCopyBookingId} title="Copy appointment ID" className="p-1 rounded hover:bg-gray-100">
+                  {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} className="text-gray-500" />}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -198,7 +203,11 @@ function BookingSuccessContent() {
               <div className="text-xs text-gray-700 space-y-1">
                 <div>Date: {booking?.date || booking?.dayName || '—'}</div>
                 <div>Time: {booking?.time || '—'}</div>
-                <div className="mt-2">ID: {bookingId || '—'}</div>
+                <div className="mt-2 flex items-center gap-2">ID: <span className="font-mono">{bookingId || '—'}</span>
+                  <button onClick={handleCopyBookingId} title="Copy appointment ID" className="p-1 rounded hover:bg-gray-100">
+                    {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} className="text-gray-500" />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

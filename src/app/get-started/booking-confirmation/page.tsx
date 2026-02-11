@@ -7,11 +7,12 @@ import { ChevronLeft, CreditCard, Wallet, DollarSign } from 'lucide-react';
 import Header from '@/app/components/Header';
 
 interface BookingData {
-  doctorId: string;
   service: string;
   serviceSlug: string;
   date: string;
   time: string;
+  startTime?: string;
+  endTime?: string;
   dayName: string;
   dayDate: number;
 }
@@ -124,11 +125,6 @@ export default function BookingConfirmationPage() {
                     <p className="text-sm text-gray-600 mb-1">Time</p>
                     <p className="text-lg font-semibold text-gray-900">{booking.time}</p>
                   </div>
-                </div>
-
-                <div className="border-t border-gray-200 pt-6">
-                  <p className="text-sm text-gray-600 mb-2">Doctor ID</p>
-                  <p className="text-gray-700">{booking.doctorId}</p>
                 </div>
               </div>
             </div>

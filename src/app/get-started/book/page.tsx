@@ -33,7 +33,6 @@ const CalendarContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const serviceSlug = searchParams.get('service');
-  const doctorId = searchParams.get('doctorId') || 'doctor-1';
 
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number>(0);
@@ -84,7 +83,6 @@ const CalendarContent = () => {
       selectedDay,
       selectedTime,
       service: serviceSlug,
-      doctorId,
     };
     localStorage.setItem('booking_context', JSON.stringify(context));
   };
@@ -109,84 +107,69 @@ const CalendarContent = () => {
     });
   };
 
-  // Convert full time range to display format
-  const parseTimeSlots = (start: string, end: string): TimeSlot[] => {
-    const displayStart = formatTime(start);
-    const displayEnd = formatTime(end);
-    const displayTime = `${displayStart} - ${displayEnd}`;
-    
-    return [{
-      id: `${start}-${end}`,
-      time: displayTime,
-      startTime: start,
-      endTime: end,
-      isAvailable: true,
-    }];
+  // Convert 24h time to 12h format with AM/PM
+  const convertTo12Hour = (time: string): string => {
+    if (!time) return time;
+    const [hour, min] = time.split(':');
+    const h = parseInt(hour);
+    const meridiem = h >= 12 ? 'PM' : 'AM';
+    const displayHour = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${displayHour}:${min} ${meridiem}`;
   };
 
-  // Convert 24h to 12h format
-  const formatTime = (time: string): string => {
-    const [hour, min] = time.split(':').map(Number);
-    const meridiem = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-    return `${displayHour}:${String(min).padStart(2, '0')} ${meridiem}`;
-  };
-
-  // Fetch availability data
+  // Fetch availability slots for selected service
   useEffect(() => {
-    const fetchAvailability = async () => {
+    const generatedDays = generateDays();
+    setDays(generatedDays);
+    setLoading(true);
+
+    (async () => {
       try {
-        setLoading(true);
-        setError(null);
+        // Fetch availability slots for the selected service
+        const serviceParam = serviceSlug ? `?service=${encodeURIComponent(serviceSlug)}` : '';
+        const res = await fetch(`http://localhost:4000/api/availability${serviceParam}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch availability');
+        const data = await res.json();
+        const allSlots: AvailabilitySlot[] = data.data || [];
+        console.debug('availability slots fetched:', allSlots.length, allSlots.slice(0,5));
 
-        const generatedDays = generateDays();
-        setDays(generatedDays);
-
-        // Fetch all doctor availability
-        const response = await fetch(
-          `http://localhost:4000/api/availability?doctorId=${doctorId}`
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch availability');
-        }
-
-        const data = await response.json();
-        const slots: AvailabilitySlot[] = data.data || [];
-
-        console.log('Fetched slots:', slots);
-        console.log('Generated days:', generatedDays);
-
-        // Build time slots by day
+        // Group slots by date
         const byDay: Record<number, TimeSlot[]> = {};
 
         generatedDays.forEach((day, idx) => {
-          const daySlots = slots.filter((slot) => slot.date === day.dateString);
-          console.log(`Day ${day.dayName} (${day.dateString}): Found ${daySlots.length} slots`, daySlots);
+          // Find slots for this date
+          const daySlots = allSlots.filter(
+            (slot) =>
+              slot.date === day.dateString
+          );
 
-          if (daySlots.length > 0) {
-            const timeSlots: TimeSlot[] = [];
-            daySlots.forEach((slot) => {
-              timeSlots.push(...parseTimeSlots(slot.start, slot.end));
-            });
-            byDay[idx] = timeSlots;
-          } else {
-            byDay[idx] = [];
-          }
+          // Convert to TimeSlot format and display as "start-end"
+          const timeSlots: TimeSlot[] = daySlots.map((slot, i) => {
+            const displayStartTime = convertTo12Hour(slot.start);
+            const displayEndTime = convertTo12Hour(slot.end);
+            const displayRange = `${displayStartTime} - ${displayEndTime}`;
+
+            return {
+              id: `${slot._id}`,
+              time: displayRange,
+              startTime: slot.start,
+              endTime: slot.end,
+              isAvailable: true,
+            };
+          });
+
+          byDay[idx] = timeSlots;
         });
 
-        console.log('Final timeSlotsByDay:', byDay);
         setTimeSlotsByDay(byDay);
+        setLoading(false);
       } catch (err) {
         console.error('Error fetching availability:', err);
-        setError((err as Error).message);
-      } finally {
+        setError('Failed to load available slots');
         setLoading(false);
       }
-    };
-
-    fetchAvailability();
-  }, [doctorId]);
+    })();
+  }, [serviceSlug]);
 
   // Get time slots for the selected day
   const currentTimeSlots = timeSlotsByDay[selectedDay] || [];
@@ -212,7 +195,6 @@ const CalendarContent = () => {
     // Store booking data and redirect to confirmation
     const selectedSlot = currentTimeSlots.find(slot => slot.time === selectedTime);
     const bookingData = {
-      doctorId,
       service: selectedService,
       serviceSlug: serviceSlug,
       date: days[selectedDay].dateString,
