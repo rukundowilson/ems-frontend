@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import api from '../../shared/services/axios';
 import Link from 'next/link';
 import { HelpCircle } from 'lucide-react';
 
@@ -18,6 +20,9 @@ const US_STATES = [
 const SUFFIXES = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'V'];
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
   const [formData, setFormData] = useState({
     firstName: '',
     middleInitial: '',
@@ -34,12 +39,17 @@ export default function SignUpPage() {
     zip: '',
     phone: '',
     textNotifications: false,
+    email: '',
+    password: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
     
     // Basic validation
     const newErrors: Record<string, string> = {};
@@ -59,8 +69,44 @@ export default function SignUpPage() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      console.log('Sign up submitted:', formData);
-      // Handle sign-up logic here
+      setLoading(true);
+      (async () => {
+        try {
+          const name = `${formData.firstName} ${formData.lastName}`.trim();
+          const payload: any = { name, phone: formData.phone };
+          if (!formData.email || !formData.password) {
+            setServerError('Email and password are required');
+            setLoading(false);
+            return;
+          }
+          payload.email = formData.email;
+          payload.password = formData.password;
+
+          const res = await api.post('/auth/signup', payload);
+          console.log('Signup response', res.data);
+          // store JWT token
+          if (res.data.token) {
+            localStorage.setItem('auth_token', res.data.token);
+            localStorage.setItem('user_role', 'patient');
+            localStorage.setItem('user_data', JSON.stringify(res.data.data));
+            console.log('Signup successful, token stored');
+            
+            // Redirect to specified URL or dashboard
+            if (redirectUrl) {
+              router.push(redirectUrl);
+            } else {
+              router.push('/get-started');
+            }
+          }
+        } catch (err: any) {
+          console.error('Signup failed', err);
+          // surface server error message when available
+          const msg = err?.response?.data?.error || err?.message || 'Network or server error';
+          setServerError(String(msg));
+        } finally {
+          setLoading(false);
+        }
+      })();
     }
   };
 
@@ -87,6 +133,28 @@ export default function SignUpPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-10">
+            {/* Account credentials */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Account</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) => updateField('email', e.target.value)}
+                  className="w-full px-0 py-2 border-0 border-b-2 border-(--color-gray-border) focus:outline-none focus:border-(--color-purple-primary) transition-colors bg-transparent"
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={(e) => updateField('password', e.target.value)}
+                  className="w-full px-0 py-2 border-0 border-b-2 border-(--color-gray-border) focus:outline-none focus:border-(--color-purple-primary) transition-colors bg-transparent"
+                  required
+                />
+              </div>
+            </div>
             {/* Profile Section */}
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-(--color-text-primary)">
@@ -398,10 +466,14 @@ export default function SignUpPage() {
             <div className="flex flex-col items-center gap-6 pt-6">
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full max-w-sm bg-(--color-gray-disabled) hover:bg-(--color-purple-primary) text-white font-semibold py-4 px-8 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Continue
+                {loading ? 'Creating account...' : 'Continue'}
               </button>
+              {serverError && (
+                <p className="mt-4 text-red-600 text-center">{serverError}</p>
+              )}
 
               {/* Sign In Link */}
               <p className="text-(--color-text-secondary)">

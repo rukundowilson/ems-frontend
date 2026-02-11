@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import ServiceCard from "@/app/components/ServiceCard";
-import { Service } from "@/types/services";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import ServiceCard from '@/app/components/ServiceCard';
+import { Service } from '@/types/services';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -16,15 +16,15 @@ export default function ServicesPage() {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:4000/api/services");
+        const response = await fetch('http://localhost:4000/api/services');
         if (!response.ok) {
-          throw new Error("Failed to fetch services");
+          throw new Error('Failed to fetch services');
         }
         const data = await response.json();
         setServices(data.data || []);
         setError(null);
       } catch (err) {
-        console.error("Error fetching services:", err);
+        console.error('Error fetching services:', err);
         setError((err as Error).message);
         // Fallback to empty array if API fails
         setServices([]);
@@ -37,7 +37,7 @@ export default function ServicesPage() {
   }, []);
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
+     <Header/>
       {/* Main content */}
       <div className="max-w-5xl mx-auto px-6 py-12">
         {/* Hero Section */}
@@ -46,14 +46,10 @@ export default function ServicesPage() {
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             Quality Care When You Need It
           </h1>
-
+          
           {/* Subheading */}
           <p className="text-lg text-gray-700 leading-relaxed max-w-3xl mb-8">
-            Expert medical services across multiple departments including{" "}
-            <span className="font-semibold">
-              emergency care, surgery, diagnostics, and specialized treatments
-            </span>
-            .
+            Expert medical services across multiple departments including <span className="font-semibold">emergency care, surgery, diagnostics, and specialized treatments</span>.
           </p>
 
           {/* Divider line */}
@@ -89,34 +85,25 @@ export default function ServicesPage() {
             </div>
           )}
 
-          {!loading &&
-            services.map((service, index) => (
-              <ServiceCard
-                key={service._id || service.id || `service-${index}`}
-                service={service}
-              />
-            ))}
+          {!loading && services.map((service, index) => (
+            <ServiceCard key={service._id || service.id || `service-${index}`} service={service} />
+          ))}
         </div>
 
         {/* See everything link - goes to another page */}
         <div className="text-center mt-16 pt-8">
-          <Link
+          <Link 
             href="/services/all"
             className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:underline text-lg font-semibold transition-all group"
           >
             <span>See all our services</span>
-            <svg
-              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
+            <svg 
+              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" 
+              fill="none" 
+              stroke="currentColor" 
               viewBox="0 0 24 24"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
         </div>

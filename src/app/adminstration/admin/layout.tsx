@@ -2,15 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
   Calendar,
   Settings,
   LogOut,
+  Briefcase,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLayout({
   children,
@@ -43,21 +43,14 @@ export default function AdminLayout({
         .slice(0, 2)
         .join("")
         .toUpperCase()
-    : "M";
-
-  // Only show doctor sidebar for doctor routes
-  if (!pathname?.startsWith("/adminstration/doctor")) {
-    return <>{children}</>;
-  }
+    : "A";
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <div className="w-28 bg-gradient-to-b from-blue-900 to-blue-700 text-white flex flex-col items-center py-6 space-y-8 fixed h-screen z-40">
-        {/* Logo / Profile */}
         <div
           className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden"
-          title={user?.name || "Profile"}
+          title={user?.name || "Admin"}
         >
           {user?.avatar ? (
             <img
@@ -70,34 +63,42 @@ export default function AdminLayout({
           )}
         </div>
 
-        {/* Navigation Icons */}
         <nav className="flex flex-col space-y-8">
           <Link
-            href="/adminstration/doctor"
-            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/doctor" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
-            title="Dashboard"
+            href="/adminstration/admin"
+            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/admin" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
+            title="Overview"
           >
             <LayoutDashboard className="w-6 h-6 text-white" />
           </Link>
-          <button
-            className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-500 transition"
-            title="Patients"
+          <Link
+            href="/adminstration/admin/doctors"
+            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/admin/doctors" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
+            title="Doctors"
           >
             <Users className="w-6 h-6 text-white" />
-          </button>
+          </Link>
           <Link
-            href="/adminstration/doctor/calendar"
-            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/doctor/calendar" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
-            title="Calendar Planning"
+            href="/adminstration/admin/appointments"
+            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/admin/appointments" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
+            title="Appointments"
           >
             <Calendar className="w-6 h-6 text-white" />
           </Link>
-          <button
-            className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-500 transition"
+          <Link
+            href="/adminstration/admin/services"
+            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname?.includes("/services") ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
+            title="Services"
+          >
+            <Briefcase className="w-6 h-6 text-white" />
+          </Link>
+          <Link
+            href="/adminstration/admin/settings"
+            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/admin/settings" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
             title="Settings"
           >
             <Settings className="w-6 h-6 text-white" />
-          </button>
+          </Link>
         </nav>
         <div className="mt-auto mb-4">
           <button
@@ -115,7 +116,6 @@ export default function AdminLayout({
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 ml-28 overflow-auto">{children}</div>
     </div>
   );
