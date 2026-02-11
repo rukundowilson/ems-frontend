@@ -83,11 +83,7 @@ export default function BookingConfirmationPage() {
   }
 
   return (
-<<<<<<< HEAD
-    <div className="min-h-screen bg-gray-50">
-=======
     <div className="min-h-screen bg-gray-100">
->>>>>>> main
         <Header/>
       <div className="max-w-6xl mx-auto my-12">
         {/* Header */}
@@ -207,10 +203,7 @@ export default function BookingConfirmationPage() {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-=======
       <br />
->>>>>>> main
     </div>
   );
 }
