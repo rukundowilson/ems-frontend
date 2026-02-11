@@ -1,16 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Settings,
-  LogOut,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Users, Calendar, Settings, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({
   children,
@@ -20,13 +14,11 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
 
-  const [user, setUser] = useState<{ name?: string; avatar?: string } | null>(
-    null,
-  );
+  const [user, setUser] = useState<{ name?: string; avatar?: string } | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const raw = localStorage.getItem("user_data");
+    if (typeof window === 'undefined') return;
+    const raw = localStorage.getItem('user_data');
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw);
@@ -38,17 +30,12 @@ export default function AdminLayout({
 
   const initials = user?.name
     ? user.name
-        .split(" ")
+        .split(' ')
         .map((n: string) => n[0])
         .slice(0, 2)
-        .join("")
+        .join('')
         .toUpperCase()
-    : "M";
-
-  // Only show doctor sidebar for doctor routes
-  if (!pathname?.startsWith("/adminstration/doctor")) {
-    return <>{children}</>;
-  }
+    : 'M';
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -57,14 +44,10 @@ export default function AdminLayout({
         {/* Logo / Profile */}
         <div
           className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden"
-          title={user?.name || "Profile"}
+          title={user?.name || 'Profile'}
         >
           {user?.avatar ? (
-            <img
-              src={user.avatar}
-              alt={user.name || "avatar"}
-              className="w-full h-full object-cover"
-            />
+            <img src={user.avatar} alt={user.name || 'avatar'} className="w-full h-full object-cover" />
           ) : (
             <span>{initials}</span>
           )}
@@ -102,10 +85,10 @@ export default function AdminLayout({
         <div className="mt-auto mb-4">
           <button
             onClick={() => {
-              localStorage.removeItem("auth_token");
-              localStorage.removeItem("user_role");
-              localStorage.removeItem("user_data");
-              router.push("/auth/signin");
+              localStorage.removeItem('auth_token');
+              localStorage.removeItem('user_role');
+              localStorage.removeItem('user_data');
+              router.push('/auth/signin');
             }}
             className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-400 transition"
             title="Logout"
@@ -116,7 +99,9 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-28 overflow-auto">{children}</div>
+      <div className="flex-1 ml-28 overflow-auto">
+        {children}
+      </div>
     </div>
   );
 }

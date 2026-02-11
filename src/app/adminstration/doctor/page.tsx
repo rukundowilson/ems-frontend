@@ -165,7 +165,7 @@ export default function DoctorDashboard() {
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                 className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:shadow-md transition"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
                   {doctorData.name.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm font-semibold text-gray-800 hidden sm:inline">{doctorData.name}</span>

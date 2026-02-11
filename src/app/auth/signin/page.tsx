@@ -4,8 +4,9 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import Header from "@/app/components/Header";
 
-function SignInForm() {
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect');
@@ -70,36 +71,16 @@ function SignInForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+    <>
+    <Header/>
+    <div className="flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Virtuwell</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">EMS</h1>
             <p className="text-gray-600">{isSignUp ? "Create Account" : "Sign In"}</p>
           </div>
-
-          {/* Auth Mode Toggle */}
-          <div className="flex gap-4 mb-8">
-            <button
-              onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                !isSignUp ? "bg-purple-100 text-purple-700" : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                isSignUp ? "bg-purple-100 text-purple-700" : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Sign Up
-            </button>
-          </div>
-
-          {/* Optional info for doctors could go here if needed */}
 
           {/* Error Message */}
           {error && (
@@ -220,13 +201,14 @@ function SignInForm() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center"><div className="text-gray-600">Loading...</div></div>}>
-      <SignInForm />
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-lg text-gray-600">Loading...</div></div>}>
+      <SignInContent />
     </Suspense>
   );
 }

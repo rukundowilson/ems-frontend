@@ -12,8 +12,21 @@ type Slot = {
 };
 
 const STORAGE_KEY = 'doctor_availability';
-const API_BASE = 'http://localhost:6000/api/availability';
-const DOCTOR_ID = 'doctor-1'; // TODO: use auth context
+const API_BASE = 'http://localhost:4000/api/availability';
+
+function getDoctorId(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      return parsed._id || parsed.id || 'doctor-1';
+    }
+  } catch (e) {
+    console.warn('Could not retrieve doctor ID from localStorage');
+  }
+  return 'doctor-1';
+}
 
 function getNextDays(n: number) {
   const days: Date[] = [];
@@ -63,7 +76,8 @@ export default function AvailabilityCalendar() {
 
   async function fetchSlots() {
     try {
-      const res = await fetch(`${API_BASE}?doctorId=${DOCTOR_ID}`);
+      const doctorId = getDoctorId();
+      const res = await fetch(`${API_BASE}?doctorId=${doctorId}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -130,7 +144,8 @@ export default function AvailabilityCalendar() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}?doctorId=${DOCTOR_ID}`, {
+      const doctorId = getDoctorId();
+      const res = await fetch(`${API_BASE}?doctorId=${doctorId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: selectedDate, slots: timeRows }),
@@ -301,7 +316,7 @@ export default function AvailabilityCalendar() {
                     daySlots
                       .sort((a, b) => (a.start > b.start ? 1 : -1))
                       .map((s) => (
-                        <div key={s.id} className="flex items-start gap-2 text-xs">
+                        <div key={s._id || s.id} className="flex items-start gap-2 text-xs">
                           <div className="text-gray-500 w-16">{s.start}</div>
                           <div className="flex-1">
                             <div className="font-semibold text-gray-900">Available</div>

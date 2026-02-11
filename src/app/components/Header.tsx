@@ -54,12 +54,11 @@ const Header = () => {
   };
 
   return (
-    <header className="py-2 bg-white shadow-md sticky top-0 z-50">
+    <header className="py-2 bg-white shadow-sm mb-12 sticky top-0 z-50">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg"></div>
               <span className="text-2xl font-bold text-gray-900 tracking-tight">EMS</span>
             </Link>
           </div>
@@ -72,6 +71,7 @@ const Header = () => {
             <Link href="/reviews" className="text-gray-700 hover:text-gray-900 font-medium text-base">Reviews</Link>
             <Link href="/blog" className="text-gray-700 hover:text-gray-900 font-medium text-base">Blog</Link>
             <Link href="/faq" className="text-gray-700 hover:text-gray-900 font-medium text-base">FAQ</Link>
+            <Link href="/get-started/booking-search" className="text-purple-600 hover:text-purple-700 font-semibold text-base">track-appointment</Link>
           </nav>
 
           <div className="flex items-center">
