@@ -12,6 +12,7 @@ export default function AdminBookingDetailsPage() {
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [serviceName, setServiceName] = useState<string>('');
 
   useEffect(() => {
     if (!id) {
@@ -25,6 +26,21 @@ export default function AdminBookingDetailsPage() {
         if (!res.ok) throw new Error('Failed to fetch booking');
         const data = await res.json();
         setBooking(data.data);
+
+        // Fetch service name if booking has a service ID
+        if (data.data?.service) {
+          try {
+            const serviceRes = await fetch(`http://localhost:4000/api/services/${data.data.service}`);
+            if (serviceRes.ok) {
+              const serviceData = await serviceRes.json();
+              setServiceName(serviceData.data?.title || data.data.service);
+            } else {
+              setServiceName(data.data.service);
+            }
+          } catch (err) {
+            setServiceName(data.data.service);
+          }
+        }
       } catch (err) {
         console.error('Error fetching booking:', err);
       } finally {
@@ -137,7 +153,7 @@ export default function AdminBookingDetailsPage() {
               <div className="bg-gray-50 p-4 rounded">
                 <div className="text-xs text-gray-500">SERVICE DESCRIPTION</div>
                 <div className="font-semibold mt-2">Appointment Fees</div>
-                <div className="text-sm text-gray-600 mt-3">Service: {b.service}</div>
+                <div className="text-sm text-gray-600 mt-3">Service: {serviceName || b.service}</div>
                 <div className="text-sm text-gray-600">Doctor: {b.doctorId || 'doctor-1'}</div>
               </div>
             </div>

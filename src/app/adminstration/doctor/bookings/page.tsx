@@ -9,6 +9,7 @@ export default function BookingsListPage() {
   const [loading, setLoading] = useState(true);
   const [doctorServices, setDoctorServices] = useState<any[]>([]);
   const [selectedService, setSelectedService] = useState<any | null>(null);
+  const [serviceMap, setServiceMap] = useState<Record<string, string>>({}); // Maps service ID to title
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -66,6 +67,23 @@ export default function BookingsListPage() {
         const data = await res.json();
         const list = data.data || [];
         setBookings(list.map((b: any) => ({ ...b })));
+
+        // Fetch all services to build a mapping
+        try {
+          const servicesRes = await fetch('http://localhost:4000/api/services', { cache: 'no-store' });
+          if (servicesRes.ok) {
+            const servicesData = await servicesRes.json();
+            const services = servicesData.data || [];
+            const map: Record<string, string> = {};
+            services.forEach((s: any) => {
+              if (s._id) map[String(s._id)] = s.title;
+              if (s.id) map[String(s.id)] = s.title;
+            });
+            setServiceMap(map);
+          }
+        } catch (err) {
+          console.error('Error fetching services:', err);
+        }
       } catch (err) {
         console.error('Error fetching bookings:', err);
         setBookings([]);
@@ -94,11 +112,11 @@ export default function BookingsListPage() {
           <div className="text-sm text-gray-600">Total: {filtered.length}</div>
         </div>
 
-        <div className="mb-4 flex gap-2">
+        <div className="mb-4 flex gap-2 flex-wrap">
           {doctorServices.length > 0 ? (
             doctorServices.map((s, idx) => {
               const key = typeof s === 'string' ? s : (s._id || s.slug || s.title || s.name || String(idx));
-              const label = typeof s === 'string' ? s : (s.title || s.name || s.slug || JSON.stringify(s));
+              const label = serviceMap[String(s)] || (typeof s === 'string' ? s : (s.title || s.name || s.slug || JSON.stringify(s)));
               return (
                 <button key={key} onClick={() => setSelectedService(s)} className={`px-3 py-1 rounded-full text-xs font-semibold ${selectedService === s ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
                   {label}
@@ -119,7 +137,7 @@ export default function BookingsListPage() {
               <div key={b._id} className="bg-white rounded p-4 shadow flex items-center justify-between">
                 <div>
                   <div className="font-semibold">{b.patientName || b.patientEmail || 'Patient'}</div>
-                  <div className="text-xs text-gray-500">{b.service} • {b.date} • {b.time}</div>
+                  <div className="text-xs text-gray-500">{serviceMap[b.service] || b.service} • {b.date} • {b.time}</div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-xs text-gray-500 font-mono">{String(b._id).slice(0,8)}</div>

@@ -193,7 +193,7 @@ function BookingSuccessContent() {
               <p className="text-xs text-gray-600 font-semibold mb-2">SERVICE DESCRIPTION</p>
               <div className="text-sm text-gray-800">
                 <div className="font-semibold">Appointment Fees</div>
-                <div className="text-xs mt-1">Service: {booking?.service || '—'}</div>
+                <div className="text-xs mt-1">Service: {booking?.serviceName || '—'}</div>
                 <div className="text-xs">Doctor: {booking?.doctorId || '—'}</div>
               </div>
             </div>

@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import Header from '@/app/components/Header';
 
 interface BookingData {
-  service: string;
-  serviceSlug: string;
+  serviceId: string;
+  serviceName: string;
   date: string;
   time: string;
   startTime?: string;
@@ -20,7 +20,7 @@ interface BookingData {
 
 const PRICE = 150;
 
-export default function BookingDetailsPage() {
+function BookingDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [booking, setBooking] = useState<BookingData | null>(null);
@@ -175,7 +175,7 @@ export default function BookingDetailsPage() {
 
       const bookingPayload = {
         // doctorId is NOT required - admin will assign doctor later
-        service: booking.service,
+        service: booking.serviceId,
         date: booking.date,
         time: booking.time,
         paymentMethod: booking.paymentMethod,
@@ -223,7 +223,8 @@ export default function BookingDetailsPage() {
       // Store booking success data for receipt
       const successData = {
         appointmentId: result.data._id,
-        service: booking.service,
+        serviceId: booking.serviceId,
+        serviceName: booking.serviceName,
         date: booking.date,
         time: booking.time,
         dayName: booking.dayName,
@@ -271,7 +272,7 @@ export default function BookingDetailsPage() {
       const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
       const b = ['','', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
 
-      function inWords(n: number) {
+      function inWords(n: number): string {
         if (n < 20) return a[n];
         if (n < 100) return b[Math.floor(n/10)] + (n%10 ? ' ' + a[n%10] : '');
         if (n < 1000) return a[Math.floor(n/100)] + ' Hundred' + (n%100 ? ' ' + inWords(n%100) : '');
@@ -579,7 +580,7 @@ export default function BookingDetailsPage() {
               <div className="space-y-4 mb-6">
                 <div>
                   <p className="text-sm text-gray-600">Service</p>
-                  <p className="text-gray-900 font-semibold">{booking.service}</p>
+                  <p className="text-gray-900 font-semibold">{booking.serviceName}</p>
                 </div>
 
                 <div>
@@ -617,5 +618,13 @@ export default function BookingDetailsPage() {
       </div>
       <br />
     </div>
+  );
+}
+
+export default function BookingDetailsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <BookingDetailsContent />
+    </Suspense>
   );
 }

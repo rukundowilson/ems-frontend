@@ -6,8 +6,9 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ service }: ServiceCardProps) {
+  const serviceId = service._id || service.id;
   return (
-    <Link href={`/get-started/book?service=${service.slug}`}>
+    <Link href={`/get-started/book?service=${serviceId}`}>
       <div
         className="
           bg-white

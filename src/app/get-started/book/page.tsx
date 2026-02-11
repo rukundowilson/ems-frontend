@@ -32,7 +32,7 @@ interface AvailabilitySlot {
 const CalendarContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const serviceSlug = searchParams.get('service');
+  const serviceId = searchParams.get('service');
 
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number>(0);
@@ -42,22 +42,7 @@ const CalendarContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
-
-  // Service mapping for display
-  const serviceMap: Record<string, string> = {
-    'emergency-care': 'Emergency Care',
-    'general-surgery': 'General Surgery',
-    'cardiology': 'Cardiology',
-    'pediatrics': 'Pediatrics',
-    'maternity-obstetrics': 'Maternity & Obstetrics',
-    'radiology-imaging': 'Radiology & Imaging',
-    'laboratory-services': 'Laboratory Services',
-    'orthopedics': 'Orthopedics',
-    'dental-care': 'Dental Care',
-    'physiotherapy': 'Physiotherapy',
-  };
-
-  const selectedService = serviceSlug ? serviceMap[serviceSlug] || serviceSlug : 'Service';
+  const [selectedService, setSelectedService] = useState<{ _id: string; title: string } | null>(null);
 
   // Restore any pending booking context (no login required)
   useEffect(() => {
@@ -77,12 +62,31 @@ const CalendarContent = () => {
     }
   }, []);
 
+  // Fetch service details by ID
+  useEffect(() => {
+    if (!serviceId) return;
+
+    const fetchService = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/services/${serviceId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setSelectedService(data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching service:', err);
+      }
+    };
+
+    fetchService();
+  }, [serviceId]);
+
   // Save booking context when selections change
   const saveBookingContext = () => {
     const context = {
       selectedDay,
       selectedTime,
-      service: serviceSlug,
+      service: serviceId,
     };
     localStorage.setItem('booking_context', JSON.stringify(context));
   };
@@ -126,7 +130,7 @@ const CalendarContent = () => {
     (async () => {
       try {
         // Fetch availability slots for the selected service
-        const serviceParam = serviceSlug ? `?service=${encodeURIComponent(serviceSlug)}` : '';
+        const serviceParam = serviceId ? `?service=${encodeURIComponent(serviceId)}` : '';
         const res = await fetch(`http://localhost:4000/api/availability${serviceParam}`, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch availability');
         const data = await res.json();
@@ -169,7 +173,7 @@ const CalendarContent = () => {
         setLoading(false);
       }
     })();
-  }, [serviceSlug]);
+  }, [serviceId]);
 
   // Get time slots for the selected day
   const currentTimeSlots = timeSlotsByDay[selectedDay] || [];
@@ -195,8 +199,8 @@ const CalendarContent = () => {
     // Store booking data and redirect to confirmation
     const selectedSlot = currentTimeSlots.find(slot => slot.time === selectedTime);
     const bookingData = {
-      service: selectedService,
-      serviceSlug: serviceSlug,
+      serviceId: serviceId,
+      serviceName: selectedService?.title || 'Service',
       date: days[selectedDay].dateString,
       time: selectedTime,
       startTime: selectedSlot?.startTime,
@@ -242,7 +246,7 @@ const CalendarContent = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
         {/* Left Panel - Disease Info */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">{selectedService}</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">{selectedService?.title || 'Service'}</h2>
           <p className="text-gray-600 text-lg">Book your appointment today</p>
         </div>
 

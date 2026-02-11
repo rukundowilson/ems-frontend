@@ -7,8 +7,8 @@ import { ChevronLeft, CreditCard, Wallet, DollarSign } from 'lucide-react';
 import Header from '@/app/components/Header';
 
 interface BookingData {
-  service: string;
-  serviceSlug: string;
+  serviceId: string;
+  serviceName: string;
   date: string;
   time: string;
   startTime?: string;
@@ -111,7 +111,7 @@ export default function BookingConfirmationPage() {
               <div className="space-y-6">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Service</p>
-                  <p className="text-lg font-semibold text-gray-900">{booking.service}</p>
+                  <p className="text-lg font-semibold text-gray-900">{booking.serviceName}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
