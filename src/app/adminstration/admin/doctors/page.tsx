@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Plus, X } from "lucide-react";
+import { Search, Plus, X, Trash2 } from "lucide-react";
+import { useDoctors, useUpdateDoctor, useCreateDoctor, useDeleteDoctor, useServices } from "@/app/shared/hooks/useAdminData";
 
 const dummyDoctors = [
   {
@@ -40,7 +41,12 @@ const dummyDoctors = [
 ];
 
 export default function DoctorsPage() {
-  const [doctors, setDoctors] = useState(dummyDoctors);
+  const { data: doctors = [], isLoading } = useDoctors();
+  const { data: services = [] } = useServices();
+  const updateDoctor = useUpdateDoctor();
+  const createDoctor = useCreateDoctor();
+  const deleteDoctor = useDeleteDoctor();
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit" | "view">("add");
@@ -53,8 +59,10 @@ export default function DoctorsPage() {
     availability: "",
     phone: "",
     email: "",
+    password: "",
     status: "Active",
   });
+  const [customService, setCustomService] = useState("");
 
   const handleAdd = () => {
     setModalMode("add");
@@ -66,6 +74,7 @@ export default function DoctorsPage() {
       availability: "",
       phone: "",
       email: "",
+      password: "",
       status: "Active",
     });
     setShowModal(true);
@@ -74,29 +83,81 @@ export default function DoctorsPage() {
   const handleEdit = (doctor: any) => {
     setModalMode("edit");
     setSelectedDoctor(doctor);
-    setFormData(doctor);
+    setFormData({
+      name: doctor.name || "",
+      title: doctor.title || "",
+      role: doctor.role || "",
+      specialization: doctor.specialization || "",
+      availability: doctor.availability || "",
+      phone: doctor.phone || "",
+      email: doctor.email || "",
+      status: doctor.status || "Active",
+    });
     setShowModal(true);
   };
 
   const handleView = (doctor: any) => {
     setModalMode("view");
     setSelectedDoctor(doctor);
-    setFormData(doctor);
+    setFormData({
+      name: doctor.name || "",
+      title: doctor.title || "",
+      role: doctor.role || "",
+      specialization: doctor.specialization || "",
+      availability: doctor.availability || "",
+      phone: doctor.phone || "",
+      email: doctor.email || "",
+      status: doctor.status || "Active",
+    });
     setShowModal(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    const serviceValue = formData.specialization === "custom" ? customService : formData.specialization;
+    
     if (modalMode === "add") {
-      setDoctors([...doctors, { id: Date.now(), ...formData }]);
-    } else if (modalMode === "edit") {
-      setDoctors(doctors.map((d) => (d.id === selectedDoctor.id ? { ...d, ...formData } : d)));
+      await createDoctor.mutateAsync({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        role: "doctor",
+        specialization: serviceValue,
+        title: formData.title,
+        availability: formData.availability,
+        status: formData.status,
+      });
+    } else if (modalMode === "edit" && selectedDoctor) {
+      await updateDoctor.mutateAsync({ 
+        id: selectedDoctor._id, 
+        data: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          specialization: serviceValue,
+          title: formData.title,
+          availability: formData.availability,
+          status: formData.status,
+        }
+      });
     }
     setShowModal(false);
+    setCustomService("");
   };
 
-  const filteredDoctors = doctors.filter((doc) =>
-    doc.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleDelete = async (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete ${name}?`)) {
+      await deleteDoctor.mutateAsync(id);
+    }
+  };
+
+  const filteredDoctors = doctors.filter((doc: any) =>
+    doc.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading doctors...</div>;
+  }
 
   return (
     <div className="p-8">
@@ -125,11 +186,11 @@ export default function DoctorsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDoctors.map((doctor) => (
-          <div key={doctor.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        {filteredDoctors.map((doctor: any) => (
+          <div key={doctor._id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
             <div className="flex items-start justify-between mb-4">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xl">
-                {doctor.name.split(" ")[1][0]}
+                {doctor.name?.split(" ")[1]?.[0] || doctor.name?.charAt(0) || 'D'}
               </div>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -138,29 +199,29 @@ export default function DoctorsPage() {
                     : "bg-orange-100 text-orange-600"
                 }`}
               >
-                {doctor.status}
+                {doctor.status || 'Active'}
               </span>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-1">{doctor.name}</h3>
-            <p className="text-sm text-gray-600 mb-1">{doctor.title}</p>
+            <h3 className="text-xl font-bold text-gray-800 mb-1">{doctor.name || 'N/A'}</h3>
+            <p className="text-sm text-gray-600 mb-1">{doctor.title || 'N/A'}</p>
             <p className="text-sm text-teal-600 font-semibold mb-3">{doctor.role}</p>
             
             <div className="space-y-2 text-sm">
               <div>
                 <span className="text-gray-500">Specialization:</span>
-                <span className="text-gray-800 ml-2">{doctor.specialization}</span>
+                <span className="text-gray-800 ml-2">{doctor.specialization || 'N/A'}</span>
               </div>
               <div>
                 <span className="text-gray-500">Availability:</span>
-                <span className="text-gray-800 ml-2">{doctor.availability}</span>
+                <span className="text-gray-800 ml-2">{doctor.availability || 'N/A'}</span>
               </div>
               <div>
                 <span className="text-gray-500">Phone:</span>
-                <span className="text-gray-800 ml-2">{doctor.phone}</span>
+                <span className="text-gray-800 ml-2">{doctor.phone || 'N/A'}</span>
               </div>
               <div>
                 <span className="text-gray-500">Email:</span>
-                <span className="text-gray-800 ml-2 text-xs">{doctor.email}</span>
+                <span className="text-gray-800 ml-2 text-xs">{doctor.email || 'N/A'}</span>
               </div>
             </div>
 
@@ -170,6 +231,13 @@ export default function DoctorsPage() {
               </button>
               <button onClick={() => handleView(doctor)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg text-sm">
                 View Details
+              </button>
+              <button 
+                onClick={() => handleDelete(doctor._id, doctor.name)} 
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm"
+                title="Delete"
+              >
+                Delete
               </button>
             </div>
           </div>
@@ -219,15 +287,35 @@ export default function DoctorsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Specialization</label>
-                <input
-                  type="text"
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Service</label>
+                <select
                   value={formData.specialization}
-                  onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, specialization: e.target.value });
+                    if (e.target.value !== "custom") setCustomService("");
+                  }}
                   disabled={modalMode === "view"}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-100"
-                />
+                >
+                  <option value="">Select Service</option>
+                  {services.map((service: any) => (
+                    <option key={service._id} value={service.title}>{service.title}</option>
+                  ))}
+                  <option value="custom">+ Create New Service</option>
+                </select>
               </div>
+              {formData.specialization === "custom" && modalMode !== "view" && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Custom Service Name</label>
+                  <input
+                    type="text"
+                    value={customService}
+                    onChange={(e) => setCustomService(e.target.value)}
+                    placeholder="Enter new service name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Availability</label>
                 <input
@@ -258,6 +346,17 @@ export default function DoctorsPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-100"
                 />
               </div>
+              {modalMode === "add" && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
                 <select
@@ -274,8 +373,12 @@ export default function DoctorsPage() {
             </div>
             {modalMode !== "view" && (
               <div className="flex gap-2 mt-6">
-                <button onClick={handleSubmit} className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg">
-                  {modalMode === "add" ? "Add" : "Save"}
+                <button 
+                  onClick={handleSubmit} 
+                  disabled={createDoctor.isPending || updateDoctor.isPending}
+                  className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg disabled:opacity-50"
+                >
+                  {createDoctor.isPending || updateDoctor.isPending ? 'Saving...' : modalMode === "add" ? "Add" : "Save"}
                 </button>
                 <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg">
                   Cancel
