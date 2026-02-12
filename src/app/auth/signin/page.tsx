@@ -13,8 +13,53 @@ export default function SignInPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+<<<<<<< Updated upstream
     console.log("Sign in submitted:", formData);
     // Handle sign-in logic here
+=======
+    setError(null);
+    setLoading(true);
+
+    try {
+      const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
+      const payload = isSignUp
+        ? { email: formData.email, password: formData.password, name: formData.name, phone: formData.phone, role: "patient" }
+        : { email: formData.email, password: formData.password };
+
+      const response = await fetch(`http://localhost:4000${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Authentication failed");
+      }
+
+      // Save token and user info
+      localStorage.setItem("auth_token", data.token);
+      const detectedRole = data.data?.role || "patient";
+      localStorage.setItem("user_role", detectedRole);
+      localStorage.setItem("user_data", JSON.stringify(data.data));
+
+      // Redirect to specified URL or based on detected role
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else if (detectedRole === "admin") {
+        router.push("/adminstration/admin");
+      } else if (detectedRole === "doctor") {
+        router.push("/adminstration/doctor");
+      } else {
+        router.push("/get-started");
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+>>>>>>> Stashed changes
   };
 
   return (
