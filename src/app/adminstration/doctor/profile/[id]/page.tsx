@@ -111,7 +111,7 @@ export default function DoctorProfilePage() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back button */}
         <Link
-          href="/get-started/all"
+          href="/adminstration/doctor"
           className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8"
         >
           <ChevronLeft className="w-5 h-5 mr-2" />
