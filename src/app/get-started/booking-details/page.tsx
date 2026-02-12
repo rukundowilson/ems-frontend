@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import Header from '@/app/components/Header';
+import api from '@/app/shared/services/axios';
 
 interface BookingData {
   serviceId: string;
@@ -47,10 +48,8 @@ function BookingDetailsContent() {
       // Viewing an existing booking: fetch from API
       (async () => {
         try {
-          const res = await fetch(`http://localhost:4000/api/bookings/${bookingId}`);
-          if (!res.ok) throw new Error('Failed to fetch booking');
-          const data = await res.json();
-          setBooking(data.data as any);
+          const res = await api.get(`/bookings/${bookingId}`);
+          setBooking(res.data.data as any);
         } catch (err) {
           console.error('Error fetching booking by id:', err);
           router.push('/get-started/book');
@@ -199,23 +198,7 @@ function BookingDetailsContent() {
         });
       }
 
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch('http://localhost:4000/api/bookings', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(bookingPayload),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to create booking');
+      const response = await api.post('/bookings', bookingPayload);
       }
 
       const result = await response.json();

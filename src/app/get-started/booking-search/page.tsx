@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, Search, AlertCircle, CheckCircle, Copy } from 'lucide-react';
 import Header from '@/app/components/Header';
+import api from '@/app/shared/services/axios';
 
 interface BookingInfo {
   _id: string;
@@ -79,14 +80,8 @@ export default function BookingSearchPage() {
     setSearched(true);
 
     try {
-      const response = await fetch(`http://localhost:4000/api/bookings/${searchId.trim()}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Booking not found');
-      }
-
-      setBooking(data.data || data);
+      const response = await api.get(`/bookings/${searchId.trim()}`);
+      setBooking(response.data.data || response.data);
     } catch (err) {
       const errorMessage = (err as Error).message;
       if (errorMessage.includes('Booking not found')) {

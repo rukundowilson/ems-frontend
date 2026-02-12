@@ -7,6 +7,7 @@ import { ChevronLeft, Mail, Phone, Award, Briefcase, Clock } from 'lucide-react'
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { Service } from '@/types/services';
+import api from '@/app/shared/services/axios';
 
 interface Doctor {
   _id: string;
@@ -39,19 +40,12 @@ export default function DoctorProfilePage() {
         setError(null);
 
         // Fetch doctor details
-        const doctorRes = await fetch(`http://localhost:4000/api/doctors/${doctorId}`);
-        if (!doctorRes.ok) {
-          throw new Error('Failed to fetch doctor details');
-        }
-        const doctorData = await doctorRes.json();
-        setDoctor(doctorData.data);
+        const doctorRes = await api.get(`/doctors/${doctorId}`);
+        setDoctor(doctorRes.data.data);
 
         // Fetch all services
-        const servicesRes = await fetch('http://localhost:4000/api/services');
-        if (!servicesRes.ok) {
-          throw new Error('Failed to fetch services');
-        }
-        const servicesData = await servicesRes.json();
+        const servicesRes = await api.get('/services');
+        const servicesData = servicesRes.data;
         const allServices = servicesData.data || [];
         setServices(allServices);
 

@@ -127,17 +127,10 @@ export default function AdminLayout({
           >
             <Calendar className="w-6 h-6 text-white" />
           </Link>
-<<<<<<< HEAD:src/app/adminstration/layout.tsx
           <Link href="/adminstration/doctor/bookings" className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === '/adminstration/doctor/bookings' ? 'bg-teal-500' : 'bg-blue-600 hover:bg-blue-500'}`} title="Bookings">
             <List className="w-6 h-6 text-white" />
           </Link>
           <button className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-500 transition" title="Settings">
-=======
-          <button
-            className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-500 transition"
-            title="Settings"
-          >
->>>>>>> d3242c68c663701aa26979bc9e0cf97c02abfb4a:src/app/adminstration/doctor/layout.tsx
             <Settings className="w-6 h-6 text-white" />
           </button>
         </nav>

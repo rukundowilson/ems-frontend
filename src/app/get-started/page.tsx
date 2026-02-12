@@ -6,6 +6,7 @@ import ServiceCard from '@/app/components/ServiceCard';
 import { Service } from '@/types/services';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import api from '@/app/shared/services/axios';
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -16,12 +17,8 @@ export default function ServicesPage() {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:4000/api/services');
-        if (!response.ok) {
-          throw new Error('Failed to fetch services');
-        }
-        const data = await response.json();
-        setServices(data.data || []);
+        const response = await api.get('/services');
+        setServices(response.data.data || []);
         setError(null);
       } catch (err) {
         console.error('Error fetching services:', err);

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import Header from "@/app/components/Header";
+import api from "@/app/shared/services/axios";
 
 function SignInContent() {
   const router = useRouter();
@@ -32,22 +33,13 @@ function SignInContent() {
     setLoading(true);
 
     try {
-      const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
+      const endpoint = isSignUp ? "/signup" : "/login";
       const payload = isSignUp
         ? { email: formData.email, password: formData.password, name: formData.name, phone: formData.phone, role: "patient" }
         : { email: formData.email, password: formData.password };
 
-      const response = await fetch(`http://localhost:4000${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Authentication failed");
-      }
+      const response = await api.post(`/auth${endpoint}`, payload);
+      const data = response.data;
 
       // Save token and user info
       localStorage.setItem("auth_token", data.token);

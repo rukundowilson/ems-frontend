@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import api from '@/app/shared/services/axios';
 
 type Slot = {
   _id?: string;
@@ -12,7 +13,6 @@ type Slot = {
 };
 
 const STORAGE_KEY = 'doctor_availability';
-const API_BASE = 'http://localhost:4000/api/availability';
 
 function getDoctorId(): string {
   if (typeof window === 'undefined') return '';
@@ -112,19 +112,10 @@ export default function AvailabilityCalendar() {
       if (tr.start >= tr.end) return alert('Start must be before end');
       
       try {
-        const res = await fetch(`${API_BASE}/${editingId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date: selectedDate, start: tr.start, end: tr.end }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            const updatedSlot = data.data;
-            setSlots((prev) => prev.map((s) => (String(s._id) === String(editingId) || String(s.id) === String(editingId) ? updatedSlot : s)));
-            clearForm();
-          }
-        }
+        const res = await api.put(`/availability/${editingId}`, { date: selectedDate, start: tr.start, end: tr.end });
+        const updatedSlot = res.data.data;
+        setSlots((prev) => prev.map((s) => (String(s._id) === String(editingId) || String(s.id) === String(editingId) ? updatedSlot : s)));
+        clearForm();
       } catch (err) {
         alert('Failed to update slot: ' + (err as Error).message);
       }
@@ -145,21 +136,10 @@ export default function AvailabilityCalendar() {
 
     try {
       const doctorId = getDoctorId();
-      const res = await fetch(`${API_BASE}?doctorId=${doctorId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: selectedDate, slots: timeRows }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setSlots((prev) => [...prev, ...data.data].sort((a, b) => ((a.date || '') + (a.start || '') > (b.date || '') + (b.start || '') ? 1 : -1)));
-          clearForm();
-        }
-      } else {
-        const error = await res.json();
-        alert('Failed to create slots: ' + error.error);
-      }
+      const res = await api.post('/availability', { date: selectedDate, slots: timeRows, doctorId });
+      const newData = res.data.data;
+      setSlots((prev) => [...prev, ...newData].sort((a, b) => ((a.date || '') + (a.start || '') > (b.date || '') + (b.start || '') ? 1 : -1)));
+      clearForm();
     } catch (err) {
       alert('Failed to create slots: ' + (err as Error).message);
     }
@@ -181,10 +161,8 @@ export default function AvailabilityCalendar() {
     
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/${deleteId}`, { method: 'DELETE' });
-        if (res.ok) {
-          setSlots((prev) => prev.filter((s) => s._id !== deleteId && s.id !== id));
-        }
+        await api.delete(`/availability/${deleteId}`);
+        setSlots((prev) => prev.filter((s) => s._id !== deleteId && s.id !== id));
       } catch (err) {
         alert('Failed to delete: ' + (err as Error).message);
       }

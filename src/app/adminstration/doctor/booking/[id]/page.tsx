@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Copy, Check } from 'lucide-react';
+import api from '@/app/shared/services/axios';
 // Use admin layout's sidebar/header; no top Header here
 
 export default function AdminBookingDetailsPage() {
@@ -22,23 +23,16 @@ export default function AdminBookingDetailsPage() {
 
     (async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/bookings/${id}`);
-        if (!res.ok) throw new Error('Failed to fetch booking');
-        const data = await res.json();
-        setBooking(data.data);
+        const res = await api.get(`/bookings/${id}`);
+        setBooking(res.data.data);
 
         // Fetch service name if booking has a service ID
-        if (data.data?.service) {
+        if (res.data.data?.service) {
           try {
-            const serviceRes = await fetch(`http://localhost:4000/api/services/${data.data.service}`);
-            if (serviceRes.ok) {
-              const serviceData = await serviceRes.json();
-              setServiceName(serviceData.data?.title || data.data.service);
-            } else {
-              setServiceName(data.data.service);
-            }
+            const serviceRes = await api.get(`/services/${res.data.data.service}`);
+            setServiceName(serviceRes.data.data?.title || res.data.data.service);
           } catch (err) {
-            setServiceName(data.data.service);
+            setServiceName(res.data.data.service);
           }
         }
       } catch (err) {

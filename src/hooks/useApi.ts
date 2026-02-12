@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import api from '@/app/shared/services/axios';
 
 interface UseApiProps<T> {
   url: string;
-  options?: RequestInit;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  data?: any;
   dependencies?: any[];
 }
 
-export const useApi = <T>({ url, options = {}, dependencies = [] }: UseApiProps<T>) => {
+export const useApi = <T>({ url, method = 'GET', data: initialData, dependencies = [] }: UseApiProps<T>) => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,20 +19,13 @@ export const useApi = <T>({ url, options = {}, dependencies = [] }: UseApiProps<
         setLoading(true);
         setError(null);
         
-        const response = await fetch(url, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-          ...options,
+        const response = await api({
+          url,
+          method,
+          data: initialData,
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        setData(result);
+        setData(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -41,34 +36,23 @@ export const useApi = <T>({ url, options = {}, dependencies = [] }: UseApiProps<
     fetchData();
   }, dependencies);
 
-  const refetch = () => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await fetch(url, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-          ...options,
-        });
+  const refetch = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await api({
+        url,
+        method,
+        data: initialData,
+      });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+      setData(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return { data, loading, error, refetch };

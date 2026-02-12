@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/app/components/Header';
+import api from '@/app/shared/services/axios';
 
 interface TimeSlot {
   id: string;
@@ -68,11 +69,8 @@ const CalendarContent = () => {
 
     const fetchService = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/services/${serviceId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setSelectedService(data.data);
-        }
+        const response = await api.get(`/services/${serviceId}`);
+        setSelectedService(response.data.data);
       } catch (err) {
         console.error('Error fetching service:', err);
       }
@@ -131,10 +129,8 @@ const CalendarContent = () => {
       try {
         // Fetch availability slots for the selected service
         const serviceParam = serviceId ? `?service=${encodeURIComponent(serviceId)}` : '';
-        const res = await fetch(`http://localhost:4000/api/availability${serviceParam}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('Failed to fetch availability');
-        const data = await res.json();
-        const allSlots: AvailabilitySlot[] = data.data || [];
+        const res = await api.get(`/availability${serviceParam}`);
+        const allSlots = res.data.data || [];
         console.debug('availability slots fetched:', allSlots.length, allSlots.slice(0,5));
 
         // Group slots by date

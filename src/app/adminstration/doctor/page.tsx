@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { LogOut } from 'lucide-react';
+import api from '@/app/shared/services/axios';
 
 interface DoctorUser {
   _id: string;
@@ -88,22 +89,8 @@ export default function DoctorDashboard() {
 
   const fetchAllAppointments = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:4000/api/bookings', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        console.warn(`Failed to fetch appointments: ${response.status}`);
-        setUpcomingAppointmentsState([]);
-        return;
-      }
-
-      const responseData = await response.json();
-      const bookings: Booking[] = responseData.data || [];
+      const response = await api.get('/bookings');
+      const bookings: Booking[] = response.data.data || [];
       const appointments = bookings.map((booking, index) =>
         convertBookingToAppointment(booking, index)
       );

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import api from '@/app/shared/services/axios';
+import api from '@/app/shared/services/axios';
 
 export default function BookingsListPage() {
   const router = useRouter();
@@ -26,19 +28,11 @@ export default function BookingsListPage() {
         if (doctorId) {
           (async () => {
             try {
-              const svcRes = await fetch(`http://localhost:4000/api/doctors/${doctorId}/services`, { cache: 'no-store' });
-              if (svcRes.ok) {
-                const svcData = await svcRes.json();
-                // svcData.data may be an array of strings or objects
-                setDoctorServices(Array.isArray(svcData.data) ? svcData.data : (user?.services || []));
-                setSelectedService(null);
-              } else {
-                // fallback to local user services
-                if (user?.services && Array.isArray(user.services)) {
-                  setDoctorServices(user.services);
-                  setSelectedService(null);
-                }
-              }
+              const svcRes = await api.get(`/doctors/${doctorId}/services`);
+              const svcData = svcRes.data;
+              // svcData.data may be an array of strings or objects
+              setDoctorServices(Array.isArray(svcData.data) ? svcData.data : (user?.services || []));
+              setSelectedService(null);
             } catch (err) {
               // on error, fallback to local services
               if (user?.services && Array.isArray(user.services)) {
@@ -59,28 +53,20 @@ export default function BookingsListPage() {
 
     (async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/bookings', {
-          headers: { Authorization: `Bearer ${token}` },
-          cache: 'no-store',
-        });
-        if (!res.ok) throw new Error('Failed to fetch bookings');
-        const data = await res.json();
-        const list = data.data || [];
+        const res = await api.get('/bookings');
+        const list = res.data.data || [];
         setBookings(list.map((b: any) => ({ ...b })));
 
         // Fetch all services to build a mapping
         try {
-          const servicesRes = await fetch('http://localhost:4000/api/services', { cache: 'no-store' });
-          if (servicesRes.ok) {
-            const servicesData = await servicesRes.json();
-            const services = servicesData.data || [];
-            const map: Record<string, string> = {};
-            services.forEach((s: any) => {
-              if (s._id) map[String(s._id)] = s.title;
-              if (s.id) map[String(s.id)] = s.title;
-            });
-            setServiceMap(map);
-          }
+          const servicesRes = await api.get('/services');
+          const services = servicesRes.data.data || [];
+          const map: Record<string, string> = {};
+          services.forEach((s: any) => {
+            if (s._id) map[String(s._id)] = s.title;
+            if (s.id) map[String(s.id)] = s.title;
+          });
+          setServiceMap(map);
         } catch (err) {
           console.error('Error fetching services:', err);
         }
