@@ -43,7 +43,7 @@ export default function AdminLayout({
       <div className="w-28 bg-gradient-to-b from-blue-900 to-blue-700 text-white flex flex-col items-center py-6 space-y-8 fixed h-screen z-40">
         {/* Logo / Profile - Direct Navigation */}
         <Link
-          href="/adminstration/doctor"
+          href={`/adminstration/doctor/profile/${user?._id}`}
           className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden hover:ring-2 hover:ring-yellow-300 transition"
           title={user?.name || 'Profile'}
         >
