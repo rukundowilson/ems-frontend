@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Layout from '../components/Layout';
-import Button from '../components/Button';
-import FeatureCard from '../components/FeatureCard';
-import { ClinicProvider } from '../contexts/ClinicContext';
+import Layout from './components/Layout';
+import Button from './components/Button';
+import FeatureCard from './components/FeatureCard';
 import { FaAllergies, FaVenusMars, FaEye, FaBaby, FaSyringe, FaVirus, FaHeartbeat } from 'react-icons/fa';
 import { MdSick } from 'react-icons/md';
 
@@ -43,7 +42,6 @@ export default function Home() {
   };
 
   return (
-    <ClinicProvider>
       <Layout>
         {/* Hero Section */}
         {/* Hero Section */}
@@ -336,6 +334,5 @@ export default function Home() {
         </section>
         
       </Layout>
-    </ClinicProvider>
   );
 }
