@@ -19,12 +19,14 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   const [user, setUser] = useState<{ name?: string; avatar?: string } | null>(
     null,
   );
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window === "undefined") return;
     const raw = localStorage.getItem("user_data");
     if (!raw) return;
@@ -46,7 +48,7 @@ export default function AdminLayout({
     : "A";
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50" suppressHydrationWarning>
       <div className="w-28 bg-gradient-to-b from-blue-900 to-blue-700 text-white flex flex-col items-center py-6 space-y-8 fixed h-screen z-40">
         <div
           className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden"
@@ -110,13 +112,14 @@ export default function AdminLayout({
             }}
             className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-400 transition"
             title="Logout"
+            suppressHydrationWarning
           >
             <LogOut className="w-5 h-5 text-white" />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 ml-28 overflow-auto">{children}</div>
+      <div className="flex-1 ml-28 overflow-auto" suppressHydrationWarning>{children}</div>
     </div>
   );
 }

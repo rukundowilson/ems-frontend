@@ -1,44 +1,110 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, X } from "lucide-react";
 
-const dummyServices = [
-  { id: 1, name: "General Consultation", description: "Basic health checkup and consultation", price: "$50", status: "Active" },
-  { id: 2, name: "Cardiology Checkup", description: "Heart health examination", price: "$120", status: "Active" },
-  { id: 3, name: "Neurology Consultation", description: "Brain and nervous system consultation", price: "$150", status: "Active" },
-  { id: 4, name: "Pediatric Care", description: "Child health services", price: "$80", status: "Active" },
-];
+interface Service {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+}
+
+const API_BASE = "http://localhost:4000/api/services";
 
 export default function ServicesPage() {
-  const [services, setServices] = useState(dummyServices);
+  const [services, setServices] = useState<Service[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [editingService, setEditingService] = useState<any>(null);
-  const [formData, setFormData] = useState({ name: "", description: "", price: "", status: "Active" });
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [formData, setFormData] = useState({ title: "", slug: "", description: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const res = await fetch(API_BASE);
+      const data = await res.json();
+      if (data.success) {
+        setServices(data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch services", err);
+    }
+  };
 
   const handleCreate = () => {
     setEditingService(null);
-    setFormData({ name: "", description: "", price: "", status: "Active" });
+    setFormData({ title: "", slug: "", description: "" });
+    setError("");
     setShowModal(true);
   };
 
-  const handleEdit = (service: any) => {
+  const handleEdit = (service: Service) => {
     setEditingService(service);
-    setFormData(service);
+    setFormData({ title: service.title, slug: service.slug, description: service.description });
+    setError("");
     setShowModal(true);
   };
 
-  const handleDelete = (id: number) => {
-    setServices(services.filter((s) => s.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this service?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        setServices(services.filter((s) => s._id !== id));
+      } else {
+        alert(data.error || "Failed to delete service");
+      }
+    } catch (err) {
+      alert("Failed to delete service");
+    }
   };
 
-  const handleSubmit = () => {
-    if (editingService) {
-      setServices(services.map((s) => (s.id === editingService.id ? { ...s, ...formData } : s)));
-    } else {
-      setServices([...services, { id: Date.now(), ...formData }]);
+  const handleSubmit = async () => {
+    if (!formData.title || !formData.slug || !formData.description) {
+      setError("All fields are required");
+      return;
     }
-    setShowModal(false);
+    setLoading(true);
+    setError("");
+    try {
+      if (editingService) {
+        const res = await fetch(`${API_BASE}/${editingService._id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setServices(services.map((s) => (s._id === editingService._id ? data.data : s)));
+          setShowModal(false);
+        } else {
+          setError(data.error || "Failed to update service");
+        }
+      } else {
+        const res = await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setServices([...services, data.data]);
+          setShowModal(false);
+        } else {
+          setError(data.error || "Failed to create service");
+        }
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,21 +122,20 @@ export default function ServicesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service) => (
-          <div key={service.id} className="bg-white rounded-xl shadow-md p-6">
+          <div key={service._id} className="bg-white rounded-xl shadow-md p-6">
             <div className="flex justify-between items-start mb-3">
-              <h3 className="text-xl font-bold text-gray-800">{service.name}</h3>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${service.status === "Active" ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-600"}`}>
-                {service.status}
+              <h3 className="text-xl font-bold text-gray-800">{service.title}</h3>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-600">
+                {service.slug}
               </span>
             </div>
             <p className="text-gray-600 text-sm mb-4">{service.description}</p>
-            <p className="text-2xl font-bold text-teal-600 mb-4">{service.price}</p>
             <div className="flex gap-2">
               <button onClick={() => handleEdit(service)} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-1">
                 <Edit className="w-4 h-4" />
                 Edit
               </button>
-              <button onClick={() => handleDelete(service.id)} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg flex items-center justify-center gap-1">
+              <button onClick={() => handleDelete(service._id)} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg flex items-center justify-center gap-1">
                 <Trash2 className="w-4 h-4" />
                 Delete
               </button>
@@ -87,29 +152,23 @@ export default function ServicesPage() {
               <button onClick={() => setShowModal(false)}><X className="w-6 h-6 text-gray-500" /></button>
             </div>
             <div className="space-y-4">
+              {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm">{error}</div>}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Service Name</label>
-                <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Service Title</label>
+                <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="e.g., General Consultation" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Slug</label>
+                <input type="text" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="e.g., general-consultation" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" rows={3} />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Price</label>
-                <input type="text" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
-                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" rows={3} placeholder="Describe the service..." />
               </div>
             </div>
             <div className="flex gap-2 mt-6">
-              <button onClick={handleSubmit} className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg">Save</button>
-              <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg">Cancel</button>
+              <button onClick={handleSubmit} disabled={loading} className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg disabled:opacity-50">{loading ? "Saving..." : "Save"}</button>
+              <button onClick={() => setShowModal(false)} disabled={loading} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg disabled:opacity-50">Cancel</button>
             </div>
           </div>
         </div>

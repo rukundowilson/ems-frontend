@@ -1,87 +1,159 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Filter, UserPlus, X } from "lucide-react";
 
-const dummyAppointments = [
-  {
-    id: 1,
-    patient: "John Doe",
-    service: "General Consultation",
-    date: "2024-02-10",
-    time: "10:00 AM",
-    status: "Pending",
-    assignedDoctor: null,
-  },
-  {
-    id: 2,
-    patient: "Jane Wilson",
-    service: "Cardiology Checkup",
-    date: "2024-02-10",
-    time: "11:30 AM",
-    status: "Assigned",
-    assignedDoctor: "Dr. Sarah Smith",
-  },
-  {
-    id: 3,
-    patient: "Mike Brown",
-    service: "Neurology Consultation",
-    date: "2024-02-11",
-    time: "2:00 PM",
-    status: "Pending",
-    assignedDoctor: null,
-  },
-];
+interface Booking {
+  _id: string;
+  doctorId: string;
+  patientId?: string;
+  service: string;
+  date: string;
+  time: string;
+  patientEmail?: string;
+  patientName?: string;
+  patientPhone?: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}
 
-const availableDoctors = [
-  "Dr. Sarah Smith",
-  "Dr. John Johnson",
-  "Dr. Emily Davis",
-];
+interface Doctor {
+  _id: string;
+  name: string;
+  email: string;
+  specialization?: string;
+}
+
+const API_BASE = "http://localhost:4000/api";
 
 export default function AppointmentsPage() {
-  const [appointments, setAppointments] = useState(dummyAppointments);
+  const [appointments, setAppointments] = useState<Booking[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<number | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAssignDoctor = (appointmentId: number) => {
+  useEffect(() => {
+    fetchAppointments();
+    fetchDoctors();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/bookings`);
+      const data = await res.json();
+      console.log('Appointments data:', data);
+      if (data.success) {
+        setAppointments(data.data);
+      } else {
+        console.error('Failed to fetch appointments:', data.error);
+      }
+    } catch (err) {
+      console.error("Failed to fetch appointments", err);
+    }
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/doctors`);
+      const data = await res.json();
+      console.log('Doctors data:', data);
+      if (data.success) {
+        setDoctors(data.data);
+      } else {
+        console.error('Failed to fetch doctors:', data.error);
+      }
+    } catch (err) {
+      console.error("Failed to fetch doctors", err);
+    }
+  };
+
+  const handleAssignDoctor = (appointmentId: string) => {
     setSelectedAppointment(appointmentId);
     setShowAssignModal(true);
   };
 
-  const confirmAssign = () => {
-    if (selectedAppointment && selectedDoctor) {
-      setAppointments(
-        appointments.map((apt) =>
-          apt.id === selectedAppointment
-            ? { ...apt, assignedDoctor: selectedDoctor, status: "Assigned" }
-            : apt
-        )
-      );
-      setShowAssignModal(false);
-      setSelectedDoctor("");
+  const confirmAssign = async () => {
+    if (!selectedAppointment || !selectedDoctor) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${selectedAppointment}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ doctorId: selectedDoctor, status: "confirmed" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppointments(
+          appointments.map((apt) =>
+            apt._id === selectedAppointment ? data.data : apt
+          )
+        );
+        setShowAssignModal(false);
+        setSelectedDoctor("");
+      } else {
+        alert(data.error || "Failed to assign doctor");
+      }
+    } catch (err) {
+      alert("Failed to assign doctor");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleReject = (id: number) => {
-    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "Rejected" } : apt)));
+  const handleReject = async (id: string) => {
+    if (!confirm("Are you sure you want to reject this appointment?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppointments(appointments.map((apt) => (apt._id === id ? data.data : apt)));
+      } else {
+        alert(data.error || "Failed to reject appointment");
+      }
+    } catch (err) {
+      alert("Failed to reject appointment");
+    }
   };
 
-  const handleCancel = (id: number) => {
-    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "Cancelled" } : apt)));
+  const handleCancel = async (id: string) => {
+    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/bookings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppointments(appointments.map((apt) => (apt._id === id ? data.data : apt)));
+      } else {
+        alert(data.error || "Failed to cancel appointment");
+      }
+    } catch (err) {
+      alert("Failed to cancel appointment");
+    }
   };
 
   const filteredAppointments = appointments.filter((apt) => {
-    const matchesSearch = apt.patient.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === "All" || apt.status === filterStatus;
+    const matchesSearch = apt.patientName?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+    const matchesFilter = filterStatus === "All" || apt.status === filterStatus.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
+  const getDoctorName = (doctorId: string) => {
+    const doctor = doctors.find(d => d._id === doctorId);
+    return doctor ? doctor.name : "Not assigned";
+  };
+
   return (
-    <div className="p-8">
+    <div className="p-8" suppressHydrationWarning>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Appointments Management</h1>
         <p className="text-gray-600 mt-1">Assign doctors, approve or reject appointments</p>
@@ -96,6 +168,7 @@ export default function AppointmentsPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            suppressHydrationWarning
           />
         </div>
         <div className="flex items-center gap-2">
@@ -104,12 +177,12 @@ export default function AppointmentsPage() {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            suppressHydrationWarning
           >
             <option>All</option>
             <option>Pending</option>
-            <option>Assigned</option>
             <option>Confirmed</option>
-            <option>Rejected</option>
+            <option>Completed</option>
             <option>Cancelled</option>
           </select>
         </div>
@@ -128,54 +201,61 @@ export default function AppointmentsPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredAppointments.map((apt) => (
-              <tr key={apt.id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{apt.patient}</td>
+            {filteredAppointments.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-8 px-6 text-center text-gray-500">
+                  {appointments.length === 0 ? "No appointments found in the database." : "No appointments match your search criteria."}
+                </td>
+              </tr>
+            ) : (
+              filteredAppointments.map((apt) => (
+              <tr key={apt._id} className="border-b hover:bg-gray-50">
+                <td className="py-4 px-6 font-medium">{apt.patientName || apt.patientEmail || "N/A"}</td>
                 <td className="py-4 px-6">{apt.service}</td>
                 <td className="py-4 px-6">
                   {apt.date} <br />
                   <span className="text-sm text-gray-500">{apt.time}</span>
                 </td>
                 <td className="py-4 px-6">
-                  {apt.assignedDoctor || <span className="text-gray-400 italic">Not assigned</span>}
+                  {getDoctorName(apt.doctorId)}
                 </td>
                 <td className="py-4 px-6">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      apt.status === "Pending"
+                      apt.status === "pending"
                         ? "bg-orange-100 text-orange-600"
-                        : apt.status === "Assigned"
-                          ? "bg-blue-100 text-blue-600"
-                          : apt.status === "Confirmed"
-                            ? "bg-green-100 text-green-600"
+                        : apt.status === "confirmed"
+                          ? "bg-green-100 text-green-600"
+                          : apt.status === "completed"
+                            ? "bg-blue-100 text-blue-600"
                             : "bg-red-100 text-red-600"
                     }`}
                   >
-                    {apt.status}
+                    {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
                   </span>
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex gap-2">
-                    {apt.status === "Pending" && (
+                    {apt.status === "pending" && (
                       <>
                         <button
-                          onClick={() => handleAssignDoctor(apt.id)}
+                          onClick={() => handleAssignDoctor(apt._id)}
                           className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
                         >
                           <UserPlus className="w-4 h-4" />
                           Assign
                         </button>
                         <button
-                          onClick={() => handleReject(apt.id)}
+                          onClick={() => handleReject(apt._id)}
                           className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
                         >
                           Reject
                         </button>
                       </>
                     )}
-                    {(apt.status === "Assigned" || apt.status === "Confirmed") && (
+                    {(apt.status === "confirmed" || apt.status === "completed") && (
                       <button
-                        onClick={() => handleCancel(apt.id)}
+                        onClick={() => handleCancel(apt._id)}
                         className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
                       >
                         Cancel
@@ -184,7 +264,7 @@ export default function AppointmentsPage() {
                   </div>
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>
@@ -206,11 +286,12 @@ export default function AppointmentsPage() {
                 value={selectedDoctor}
                 onChange={(e) => setSelectedDoctor(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                suppressHydrationWarning
               >
                 <option value="">Choose a doctor...</option>
-                {availableDoctors.map((doc) => (
-                  <option key={doc} value={doc}>
-                    {doc}
+                {doctors.map((doc) => (
+                  <option key={doc._id} value={doc._id}>
+                    {doc.name} {doc.specialization ? `- ${doc.specialization}` : ""}
                   </option>
                 ))}
               </select>
@@ -218,14 +299,15 @@ export default function AppointmentsPage() {
             <div className="flex gap-2">
               <button
                 onClick={confirmAssign}
-                disabled={!selectedDoctor}
+                disabled={!selectedDoctor || loading}
                 className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-300 text-white py-2 rounded-lg"
               >
-                Confirm
+                {loading ? "Assigning..." : "Confirm"}
               </button>
               <button
                 onClick={() => setShowAssignModal(false)}
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg"
+                disabled={loading}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg disabled:opacity-50"
               >
                 Cancel
               </button>
