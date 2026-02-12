@@ -41,7 +41,8 @@ export default function DoctorProfilePage() {
 
         // Fetch doctor details
         const doctorRes = await api.get(`/doctors/${doctorId}`);
-        setDoctor(doctorRes.data.data);
+        const doctorData = doctorRes.data.data;
+        setDoctor(doctorData);
 
         // Fetch all services
         const servicesRes = await api.get('/services');
@@ -50,9 +51,9 @@ export default function DoctorProfilePage() {
         setServices(allServices);
 
         // Match doctor's services with service objects
-        if (doctorRes.data?.services && Array.isArray(doctorRes.data.services)) {
+        if (doctorData?.services && Array.isArray(doctorData.services)) {
           const assigned = allServices.filter((service: Service) => 
-            doctorRes.data.services?.includes(service._id?.toString() || service.id)
+            doctorData.services?.includes(service._id?.toString() || service.id)
           );
           setAssignedServices(assigned);
         }
@@ -106,9 +107,7 @@ export default function DoctorProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
+    <div className="min-h-screen bg-gray-50">      
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back button */}
         <Link
@@ -226,7 +225,6 @@ export default function DoctorProfilePage() {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 }
