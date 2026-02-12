@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -7,8 +7,6 @@ const Header = () => {
   const [isLogged, setIsLogged] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,16 +29,13 @@ const Header = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const handleProfileClick = () => {
+    if (userRole === 'doctor') {
+      router.push('/adminstration/doctor');
+    } else {
+      router.push('/get-started');
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
@@ -49,7 +44,6 @@ const Header = () => {
     setIsLogged(false);
     setUserName(null);
     setUserRole(null);
-    setDropdownOpen(false);
     router.push('/');
   };
 
@@ -76,66 +70,22 @@ const Header = () => {
 
           <div className="flex items-center">
             {isLogged ? (
-              <div ref={dropdownRef} className="relative">
+              <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  onClick={handleProfileClick}
                   className="flex items-center gap-3 text-gray-700 hover:text-gray-900 font-semibold text-base focus:outline-none"
                 >
                   <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm">
                     {userName ? userName.charAt(0).toUpperCase() : 'P'}
                   </div>
                   <span>{userName || 'Profile'}</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
                 </button>
-
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                    <div className="p-4 border-b border-gray-200">
-                      <p className="text-sm font-semibold text-gray-900">{userName || 'User'}</p>
-                      <p className="text-xs text-gray-500 capitalize">{userRole || 'User'}</p>
-                    </div>
-                    
-                    <nav className="py-2">
-                      <Link
-                        href={userRole === 'doctor' ? '/adminstration/doctor' : '/get-started'}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        My Appointments
-                      </Link>
-                      <Link
-                        href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        Settings
-                      </Link>
-                    </nav>
-
-                    <div className="border-t border-gray-200 p-2">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded transition-colors font-medium"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <button
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700 font-semibold text-sm"
+                >
+                  Logout
+                </button>
               </div>
             ) : (
               <Link href="/auth/signin" className="text-purple-600 hover:text-purple-700 font-semibold text-base">
