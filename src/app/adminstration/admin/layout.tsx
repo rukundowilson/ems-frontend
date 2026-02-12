@@ -10,7 +10,9 @@ import {
   Settings,
   LogOut,
   Briefcase,
+  UserCircle,
 } from "lucide-react";
+import QueryProvider from "@/app/providers/QueryProvider";
 
 export default function AdminLayout({
   children,
@@ -81,6 +83,13 @@ export default function AdminLayout({
             <Users className="w-6 h-6 text-white" />
           </Link>
           <Link
+            href="/adminstration/admin/patients"
+            className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/admin/patients" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
+            title="Patients"
+          >
+            <UserCircle className="w-6 h-6 text-white" />
+          </Link>
+          <Link
             href="/adminstration/admin/appointments"
             className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname === "/adminstration/admin/appointments" ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
             title="Appointments"
@@ -121,5 +130,6 @@ export default function AdminLayout({
 
       <div className="flex-1 ml-28 overflow-auto" suppressHydrationWarning>{children}</div>
     </div>
+    </QueryProvider>
   );
 }
