@@ -8,11 +8,8 @@
     "start": "next start"
   },
   "dependencies": {
-<<<<<<< Updated upstream
-=======
     "@tanstack/react-query": "^5.90.21",
     "axios": "^1.13.4",
->>>>>>> Stashed changes
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "react": "19.2.3",
