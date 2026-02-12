@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, List, User } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Settings, List } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({
@@ -15,8 +15,6 @@ export default function AdminLayout({
   const router = useRouter();
 
   const [user, setUser] = useState<{ name?: string; avatar?: string; _id?: string } | null>(null);
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -28,20 +26,6 @@ export default function AdminLayout({
     } catch (e) {
       // ignore
     }
-  }, []);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowProfileDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, []);
 
   const initials = user?.name
@@ -57,53 +41,18 @@ export default function AdminLayout({
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="w-28 bg-gradient-to-b from-blue-900 to-blue-700 text-white flex flex-col items-center py-6 space-y-8 fixed h-screen z-40">
-        {/* Logo / Profile - Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-            className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden hover:ring-2 hover:ring-yellow-300 transition"
-            title={user?.name || 'Profile'}
-          >
-            {user?.avatar ? (
-              <img src={user.avatar} alt={user.name || 'avatar'} className="w-full h-full object-cover" />
-            ) : (
-              <span>{initials}</span>
-            )}
-          </button>
-
-          {/* Dropdown Menu */}
-          {showProfileDropdown && (
-            <div className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 rounded-lg shadow-xl py-2 w-48 z-50">
-              <div className="px-4 py-2 border-b border-gray-200">
-                <p className="font-semibold text-sm">{user?.name || 'User'}</p>
-                <p className="text-xs text-gray-500">{user?.name ? 'Profile' : 'No name'}</p>
-              </div>
-              {user?._id && (
-                <Link
-                  href={`/doctor/${user._id}`}
-                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-sm"
-                  onClick={() => setShowProfileDropdown(false)}
-                >
-                  <User className="w-4 h-4" />
-                  View Profile
-                </Link>
-              )}
-              <button
-                onClick={() => {
-                  localStorage.removeItem('auth_token');
-                  localStorage.removeItem('user_role');
-                  localStorage.removeItem('user_data');
-                  setShowProfileDropdown(false);
-                  router.push('/auth/signin');
-                }}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 transition text-sm text-red-600"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </div>
+        {/* Logo / Profile - Direct Navigation */}
+        <Link
+          href="/adminstration/doctor"
+          className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden hover:ring-2 hover:ring-yellow-300 transition"
+          title={user?.name || 'Profile'}
+        >
+          {user?.avatar ? (
+            <img src={user.avatar} alt={user.name || 'avatar'} className="w-full h-full object-cover" />
+          ) : (
+            <span>{initials}</span>
           )}
-        </div>
+        </Link>
 
         {/* Navigation Icons */}
         <nav className="flex flex-col space-y-8">
