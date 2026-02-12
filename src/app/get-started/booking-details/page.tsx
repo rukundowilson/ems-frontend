@@ -199,9 +199,7 @@ function BookingDetailsContent() {
       }
 
       const response = await api.post('/bookings', bookingPayload);
-      }
-
-      const result = await response.json();
+      const result = response.data;
 
       // Store booking success data for receipt
       const successData = {

@@ -77,13 +77,8 @@ export default function AvailabilityCalendar() {
   async function fetchSlots() {
     try {
       const doctorId = getDoctorId();
-      const res = await fetch(`${API_BASE}?doctorId=${doctorId}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setSlots(data.data);
-        }
-      }
+      const res = await api.get('/availability', { params: { doctorId } });
+      setSlots(res.data.data);
     } catch (err) {
       console.error('Failed to fetch availability:', err);
     }

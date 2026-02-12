@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/app/shared/services/axios';
-import api from '@/app/shared/services/axios';
 
 export default function BookingsListPage() {
   const router = useRouter();

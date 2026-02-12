@@ -139,12 +139,12 @@ const CalendarContent = () => {
         generatedDays.forEach((day, idx) => {
           // Find slots for this date
           const daySlots = allSlots.filter(
-            (slot) =>
+            (slot: AvailabilitySlot) =>
               slot.date === day.dateString
           );
 
           // Convert to TimeSlot format and display as "start-end"
-          const timeSlots: TimeSlot[] = daySlots.map((slot, i) => {
+          const timeSlots: TimeSlot[] = daySlots.map((slot: AvailabilitySlot, i: number) => {
             const displayStartTime = convertTo12Hour(slot.start);
             const displayEndTime = convertTo12Hour(slot.end);
             const displayRange = `${displayStartTime} - ${displayEndTime}`;

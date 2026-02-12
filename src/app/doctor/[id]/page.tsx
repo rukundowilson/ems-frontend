@@ -50,9 +50,9 @@ export default function DoctorProfilePage() {
         setServices(allServices);
 
         // Match doctor's services with service objects
-        if (doctorData.data?.services && Array.isArray(doctorData.data.services)) {
+        if (doctorRes.data?.services && Array.isArray(doctorRes.data.services)) {
           const assigned = allServices.filter((service: Service) => 
-            doctorData.data.services?.includes(service._id?.toString() || service.id)
+            doctorRes.data.services?.includes(service._id?.toString() || service.id)
           );
           setAssignedServices(assigned);
         }
