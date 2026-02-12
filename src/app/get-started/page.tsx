@@ -16,18 +16,22 @@ export default function ServicesPage() {
     const fetchServices = async () => {
       try {
         setLoading(true);
+        setError(null);
         const response = await fetch('http://localhost:4000/api/services');
         if (!response.ok) {
           throw new Error('Failed to fetch services');
         }
         const data = await response.json();
-        setServices(data.data || []);
-        setError(null);
+        if (data.success) {
+          setServices(data.data || []);
+        } else {
+          setServices([]);
+        }
       } catch (err) {
         console.error('Error fetching services:', err);
-        setError((err as Error).message);
-        // Fallback to empty array if API fails
+        // Don't show error, just use empty services
         setServices([]);
+        setError(null);
       } finally {
         setLoading(false);
       }

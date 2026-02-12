@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Search, Filter, UserPlus, X } from "lucide-react";
+import api from "@/app/shared/services/axios";
 
 interface Booking {
   _id: string;
@@ -23,7 +24,7 @@ interface Doctor {
   specialization?: string;
 }
 
-const API_BASE = "http://localhost:4000/api";
+
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Booking[]>([]);
@@ -42,13 +43,10 @@ export default function AppointmentsPage() {
 
   const fetchAppointments = async () => {
     try {
-      const res = await fetch(`${API_BASE}/bookings`);
-      const data = await res.json();
-      console.log('Appointments data:', data);
+      const res = await api.get("/bookings");
+      const data = res.data;
       if (data.success) {
         setAppointments(data.data);
-      } else {
-        console.error('Failed to fetch appointments:', data.error);
       }
     } catch (err) {
       console.error("Failed to fetch appointments", err);
@@ -57,13 +55,10 @@ export default function AppointmentsPage() {
 
   const fetchDoctors = async () => {
     try {
-      const res = await fetch(`${API_BASE}/doctors`);
-      const data = await res.json();
-      console.log('Doctors data:', data);
+      const res = await api.get("/doctors");
+      const data = res.data;
       if (data.success) {
         setDoctors(data.data);
-      } else {
-        console.error('Failed to fetch doctors:', data.error);
       }
     } catch (err) {
       console.error("Failed to fetch doctors", err);
@@ -79,12 +74,8 @@ export default function AppointmentsPage() {
     if (!selectedAppointment || !selectedDoctor) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/bookings/${selectedAppointment}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ doctorId: selectedDoctor, status: "confirmed" }),
-      });
-      const data = await res.json();
+      const res = await api.patch(`/bookings/${selectedAppointment}`, { doctorId: selectedDoctor, status: "confirmed" });
+      const data = res.data;
       if (data.success) {
         setAppointments(
           appointments.map((apt) =>
@@ -106,12 +97,8 @@ export default function AppointmentsPage() {
   const handleReject = async (id: string) => {
     if (!confirm("Are you sure you want to reject this appointment?")) return;
     try {
-      const res = await fetch(`${API_BASE}/bookings/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "cancelled" }),
-      });
-      const data = await res.json();
+      const res = await api.patch(`/bookings/${id}`, { status: "cancelled" });
+      const data = res.data;
       if (data.success) {
         setAppointments(appointments.map((apt) => (apt._id === id ? data.data : apt)));
       } else {
@@ -125,12 +112,8 @@ export default function AppointmentsPage() {
   const handleCancel = async (id: string) => {
     if (!confirm("Are you sure you want to cancel this appointment?")) return;
     try {
-      const res = await fetch(`${API_BASE}/bookings/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "cancelled" }),
-      });
-      const data = await res.json();
+      const res = await api.patch(`/bookings/${id}`, { status: "cancelled" });
+      const data = res.data;
       if (data.success) {
         setAppointments(appointments.map((apt) => (apt._id === id ? data.data : apt)));
       } else {

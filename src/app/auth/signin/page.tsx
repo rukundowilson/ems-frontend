@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import Header from "@/app/components/Header";
+import api from "@/app/shared/services/axios";
 
 function SignInContent() {
   const router = useRouter();
@@ -32,20 +33,15 @@ function SignInContent() {
     setLoading(true);
 
     try {
-      const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
+      const endpoint = isSignUp ? "/auth/signup" : "/auth/login";
       const payload = isSignUp
         ? { email: formData.email, password: formData.password, name: formData.name, phone: formData.phone, role: "patient" }
         : { email: formData.email, password: formData.password };
 
-      const response = await fetch(`http://localhost:4000${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await api.post(endpoint, payload);
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (!response.ok) {
+      if (!data.success) {
         throw new Error(data.error || "Authentication failed");
       }
 
@@ -58,13 +54,17 @@ function SignInContent() {
       // Redirect to specified URL or based on detected role
       if (redirectUrl) {
         router.push(redirectUrl);
+      } else if (detectedRole === "admin") {
+        router.push("/adminstration/admin");
       } else if (detectedRole === "doctor") {
         router.push("/adminstration/doctor");
       } else {
         router.push("/get-started");
       }
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.error || err.message || "Authentication failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

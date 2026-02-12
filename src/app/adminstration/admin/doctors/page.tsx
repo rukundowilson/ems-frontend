@@ -1,50 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Plus, X } from "lucide-react";
+import api from "@/app/shared/services/axios";
 
-const dummyDoctors = [
-  {
-    id: 1,
-    name: "Dr. Sarah Smith",
-    title: "MD, Cardiologist",
-    role: "Senior Consultant",
-    specialization: "Cardiology",
-    availability: "Mon-Fri, 9AM-5PM",
-    phone: "+1234567890",
-    email: "sarah.smith@hospital.com",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Dr. John Johnson",
-    title: "MD, Neurologist",
-    role: "Consultant",
-    specialization: "Neurology",
-    availability: "Mon-Wed, 10AM-4PM",
-    phone: "+1234567891",
-    email: "john.johnson@hospital.com",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Dr. Emily Davis",
-    title: "MD, Pediatrician",
-    role: "Junior Consultant",
-    specialization: "Pediatrics",
-    availability: "Tue-Sat, 8AM-3PM",
-    phone: "+1234567892",
-    email: "emily.davis@hospital.com",
-    status: "On Leave",
-  },
-];
+
 
 export default function DoctorsPage() {
-  const [doctors, setDoctors] = useState(dummyDoctors);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit" | "view">("add");
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     title: "",
@@ -55,6 +23,21 @@ export default function DoctorsPage() {
     email: "",
     status: "Active",
   });
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      const res = await api.get("/doctors");
+      if (res.data.success) {
+        setDoctors(res.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch doctors", err);
+    }
+  };
 
   const handleAdd = () => {
     setModalMode("add");
@@ -85,13 +68,27 @@ export default function DoctorsPage() {
     setShowModal(true);
   };
 
-  const handleSubmit = () => {
-    if (modalMode === "add") {
-      setDoctors([...doctors, { id: Date.now(), ...formData }]);
-    } else if (modalMode === "edit") {
-      setDoctors(doctors.map((d) => (d.id === selectedDoctor.id ? { ...d, ...formData } : d)));
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      if (modalMode === "add") {
+        const res = await api.post("/doctors", formData);
+        if (res.data.success) {
+          setDoctors([...doctors, res.data.data]);
+          setShowModal(false);
+        }
+      } else if (modalMode === "edit") {
+        const res = await api.patch(`/doctors/${selectedDoctor._id}`, formData);
+        if (res.data.success) {
+          setDoctors(doctors.map((d: any) => (d._id === selectedDoctor._id ? res.data.data : d)));
+          setShowModal(false);
+        }
+      }
+    } catch (err) {
+      alert("Operation failed");
+    } finally {
+      setLoading(false);
     }
-    setShowModal(false);
   };
 
   const filteredDoctors = doctors.filter((doc) =>
@@ -125,8 +122,8 @@ export default function DoctorsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDoctors.map((doctor) => (
-          <div key={doctor.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+        {filteredDoctors.map((doctor: any) => (
+          <div key={doctor._id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
             <div className="flex items-start justify-between mb-4">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xl">
                 {doctor.name.split(" ")[1][0]}
@@ -274,8 +271,8 @@ export default function DoctorsPage() {
             </div>
             {modalMode !== "view" && (
               <div className="flex gap-2 mt-6">
-                <button onClick={handleSubmit} className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg">
-                  {modalMode === "add" ? "Add" : "Save"}
+                <button onClick={handleSubmit} disabled={loading} className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg disabled:opacity-50">
+                  {loading ? "Saving..." : modalMode === "add" ? "Add" : "Save"}
                 </button>
                 <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg">
                   Cancel

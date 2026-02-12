@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, X } from "lucide-react";
+import api from "@/app/shared/services/axios";
 
 interface Service {
   _id: string;
@@ -9,8 +10,6 @@ interface Service {
   slug: string;
   description: string;
 }
-
-const API_BASE = "http://localhost:4000/api/services";
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -26,8 +25,8 @@ export default function ServicesPage() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch(API_BASE);
-      const data = await res.json();
+      const res = await api.get("/services");
+      const data = res.data;
       if (data.success) {
         setServices(data.data);
       }
@@ -53,8 +52,8 @@ export default function ServicesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this service?")) return;
     try {
-      const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
-      const data = await res.json();
+      const res = await api.delete(`/services/${id}`);
+      const data = res.data;
       if (data.success) {
         setServices(services.filter((s) => s._id !== id));
       } else {
@@ -74,12 +73,8 @@ export default function ServicesPage() {
     setError("");
     try {
       if (editingService) {
-        const res = await fetch(`${API_BASE}/${editingService._id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const data = await res.json();
+        const res = await api.patch(`/services/${editingService._id}`, formData);
+        const data = res.data;
         if (data.success) {
           setServices(services.map((s) => (s._id === editingService._id ? data.data : s)));
           setShowModal(false);
@@ -87,12 +82,8 @@ export default function ServicesPage() {
           setError(data.error || "Failed to update service");
         }
       } else {
-        const res = await fetch(API_BASE, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const data = await res.json();
+        const res = await api.post("/services", formData);
+        const data = res.data;
         if (data.success) {
           setServices([...services, data.data]);
           setShowModal(false);
