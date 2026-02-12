@@ -48,8 +48,9 @@ export default function AdminLayout({
   return (
     <div className="flex h-screen bg-gray-50">
       <div className="w-28 bg-gradient-to-b from-blue-900 to-blue-700 text-white flex flex-col items-center py-6 space-y-8 fixed h-screen z-40">
-        <div
-          className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden"
+        <Link
+          href="/adminstration/admin"
+          className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden hover:ring-2 hover:ring-yellow-300 transition"
           title={user?.name || "Admin"}
         >
           {user?.avatar ? (
@@ -61,7 +62,7 @@ export default function AdminLayout({
           ) : (
             <span>{initials}</span>
           )}
-        </div>
+        </Link>
 
         <nav className="flex flex-col space-y-8">
           <Link
