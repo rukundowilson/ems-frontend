@@ -1,37 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Filter, UserPlus, X } from "lucide-react";
+import api, { setAuthToken } from "@/app/shared/services/axios";
 
-const dummyAppointments = [
-  {
-    id: 1,
-    patient: "John Doe",
-    service: "General Consultation",
-    date: "2024-02-10",
-    time: "10:00 AM",
-    status: "Pending",
-    assignedDoctor: null,
-  },
-  {
-    id: 2,
-    patient: "Jane Wilson",
-    service: "Cardiology Checkup",
-    date: "2024-02-10",
-    time: "11:30 AM",
-    status: "Assigned",
-    assignedDoctor: "Dr. Sarah Smith",
-  },
-  {
-    id: 3,
-    patient: "Mike Brown",
-    service: "Neurology Consultation",
-    date: "2024-02-11",
-    time: "2:00 PM",
-    status: "Pending",
-    assignedDoctor: null,
-  },
-];
+interface Booking {
+  id: string;
+  doctorId: string;
+  service: string;
+  date: string;
+  time: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  patientEmail: string;
+  patientPhone: string;
+  paymentMethod: string;
+  amount: number;
+}
 
 const availableDoctors = [
   "Dr. Sarah Smith",
@@ -40,14 +26,36 @@ const availableDoctors = [
 ];
 
 export default function AppointmentsPage() {
-  const [appointments, setAppointments] = useState(dummyAppointments);
+  const [appointments, setAppointments] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<number | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState("");
 
-  const handleAssignDoctor = (appointmentId: number) => {
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      setAuthToken(token);
+    }
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/admin/bookings");
+      setAppointments(response.data.data || response.data || []);
+    } catch (error: any) {
+      console.error("Error fetching bookings:", error.response?.data || error.message);
+      setAppointments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssignDoctor = (appointmentId: string) => {
     setSelectedAppointment(appointmentId);
     setShowAssignModal(true);
   };
@@ -57,7 +65,7 @@ export default function AppointmentsPage() {
       setAppointments(
         appointments.map((apt) =>
           apt.id === selectedAppointment
-            ? { ...apt, assignedDoctor: selectedDoctor, status: "Assigned" }
+            ? { ...apt, doctorId: selectedDoctor, status: "assigned" }
             : apt
         )
       );
@@ -66,19 +74,28 @@ export default function AppointmentsPage() {
     }
   };
 
-  const handleReject = (id: number) => {
-    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "Rejected" } : apt)));
+  const handleReject = (id: string) => {
+    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "rejected" } : apt)));
   };
 
-  const handleCancel = (id: number) => {
-    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "Cancelled" } : apt)));
+  const handleCancel = (id: string) => {
+    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "cancelled" } : apt)));
   };
 
   const filteredAppointments = appointments.filter((apt) => {
-    const matchesSearch = apt.patient.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === "All" || apt.status === filterStatus;
+    const matchesSearch = apt.patientEmail.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          apt.patientPhone.includes(searchTerm);
+    const matchesFilter = filterStatus === "All" || apt.status.toLowerCase() === filterStatus.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  if (loading) {
+    return (
+      <div className="p-8 flex items-center justify-center">
+        <div className="text-lg text-gray-600">Loading bookings...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
@@ -106,85 +123,99 @@ export default function AppointmentsPage() {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option>All</option>
-            <option>Pending</option>
-            <option>Assigned</option>
-            <option>Confirmed</option>
-            <option>Rejected</option>
-            <option>Cancelled</option>
+            <option>pending</option>
+            <option>assigned</option>
+            <option>confirmed</option>
+            <option>rejected</option>
+            <option>cancelled</option>
           </select>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <table className="w-full">
+      <div className="bg-white rounded-xl shadow-md overflow-x-auto">
+        <table className="w-full min-w-max">
           <thead className="bg-gray-50">
             <tr>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Patient</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Service</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Date & Time</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Assigned Doctor</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Status</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Actions</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Patient Info</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Service</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Date & Time</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Payment</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Doctor ID</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Status</th>
+              <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAppointments.map((apt) => (
-              <tr key={apt.id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{apt.patient}</td>
-                <td className="py-4 px-6">{apt.service}</td>
-                <td className="py-4 px-6">
-                  {apt.date} <br />
-                  <span className="text-sm text-gray-500">{apt.time}</span>
-                </td>
-                <td className="py-4 px-6">
-                  {apt.assignedDoctor || <span className="text-gray-400 italic">Not assigned</span>}
-                </td>
-                <td className="py-4 px-6">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      apt.status === "Pending"
-                        ? "bg-orange-100 text-orange-600"
-                        : apt.status === "Assigned"
-                          ? "bg-blue-100 text-blue-600"
-                          : apt.status === "Confirmed"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
-                    }`}
-                  >
-                    {apt.status}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <div className="flex gap-2">
-                    {apt.status === "Pending" && (
-                      <>
+            {filteredAppointments.length > 0 ? (
+              filteredAppointments.map((apt) => (
+                <tr key={apt.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4">
+                    <div className="font-medium text-sm truncate max-w-[200px]">{apt.patientEmail}</div>
+                    <div className="text-xs text-gray-500">{apt.patientPhone}</div>
+                  </td>
+                  <td className="py-3 px-4 text-sm">{apt.service}</td>
+                  <td className="py-3 px-4">
+                    <div className="text-sm">{apt.date}</div>
+                    <div className="text-xs text-gray-500">{apt.time}</div>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="text-xs">{apt.paymentMethod}</div>
+                    <div className="font-semibold text-green-600 text-sm">${apt.amount}</div>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-600">{apt.doctorId}</td>
+                  <td className="py-3 px-4">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-semibold capitalize whitespace-nowrap ${
+                        apt.status === "pending"
+                          ? "bg-orange-100 text-orange-600"
+                          : apt.status === "assigned"
+                            ? "bg-blue-100 text-blue-600"
+                            : apt.status === "confirmed"
+                              ? "bg-green-100 text-green-600"
+                              : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {apt.status}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex gap-1">
+                      {apt.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => handleAssignDoctor(apt.id)}
+                            className="bg-teal-500 hover:bg-teal-600 text-white px-2 py-1 rounded text-xs flex items-center gap-1 whitespace-nowrap"
+                          >
+                            <UserPlus className="w-3 h-3" />
+                            Assign
+                          </button>
+                          <button
+                            onClick={() => handleReject(apt.id)}
+                            className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs whitespace-nowrap"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {(apt.status === "assigned" || apt.status === "confirmed") && (
                         <button
-                          onClick={() => handleAssignDoctor(apt.id)}
-                          className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+                          onClick={() => handleCancel(apt.id)}
+                          className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs whitespace-nowrap"
                         >
-                          <UserPlus className="w-4 h-4" />
-                          Assign
+                          Cancel
                         </button>
-                        <button
-                          onClick={() => handleReject(apt.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {(apt.status === "Assigned" || apt.status === "Confirmed") && (
-                      <button
-                        onClick={() => handleCancel(apt.id)}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="py-8 text-center text-gray-500">
+                  No bookings found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
