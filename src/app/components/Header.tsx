@@ -71,7 +71,7 @@ const Header = () => {
             <Link href="/reviews" className="text-gray-700 hover:text-gray-900 font-medium text-base">Reviews</Link>
             <Link href="/blog" className="text-gray-700 hover:text-gray-900 font-medium text-base">Blog</Link>
             <Link href="/faq" className="text-gray-700 hover:text-gray-900 font-medium text-base">FAQ</Link>
-            <Link href="/get-started/booking-search" className="text-purple-600 hover:text-purple-700 font-semibold text-base">track-appointment</Link>
+            <Link href="/get-started/booking-search" className="text-blue-600 hover:text-blue-700 font-semibold text-base">track-appointment</Link>
           </nav>
 
           <div className="flex items-center">
@@ -81,7 +81,7 @@ const Header = () => {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-3 text-gray-700 hover:text-gray-900 font-semibold text-base focus:outline-none"
                 >
-                  <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">
                     {userName ? userName.charAt(0).toUpperCase() : 'P'}
                   </div>
                   <span>{userName || 'Profile'}</span>
@@ -105,21 +105,21 @@ const Header = () => {
                     <nav className="py-2">
                       <Link
                         href={userRole === 'doctor' ? '/adminstration/doctor' : '/get-started'}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                         onClick={() => setDropdownOpen(false)}
                       >
                         Dashboard
                       </Link>
                       <Link
                         href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                         onClick={() => setDropdownOpen(false)}
                       >
                         My Appointments
                       </Link>
                       <Link
                         href="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                         onClick={() => setDropdownOpen(false)}
                       >
                         Settings
@@ -138,7 +138,7 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <Link href="/auth/signin" className="text-purple-600 hover:text-purple-700 font-semibold text-base">
+              <Link href="/auth/signin" className="text-blue-600 hover:text-blue-700 font-semibold text-base">
                 Sign in
               </Link>
             )}

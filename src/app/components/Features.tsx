@@ -61,7 +61,7 @@ const FeaturesSection: React.FC = () => {
                 <p className="text-lg text-gray-600 mb-2">
                   Visits as low as $0 with insurance.
                 </p>
-                <a href="#" className="text-purple-600 hover:text-purple-700 font-semibold inline-flex items-center gap-1">
+                <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1">
                   Pricing & insurance
                   <span>›</span>
                 </a>

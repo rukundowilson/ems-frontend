@@ -56,7 +56,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-white">
       {/* CTA Section */}
-      <div className="w-full bg-purple-600 py-16 px-6">
+      <div className="w-full bg-gradient-to-b from-blue-900 to-blue-700 py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-white text-sm font-semibold uppercase tracking-wide mb-3">
             We're here to help
@@ -68,7 +68,7 @@ export default function Footer() {
 
           <div className="w-16 h-0.5 bg-white/50 mx-auto mb-8"></div>
 
-          <button className="bg-white text-purple-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg inline-flex items-center">
+          <button className="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg inline-flex items-center">
             Get started
             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -86,7 +86,7 @@ export default function Footer() {
                 <a 
                   key={index}
                   href="#" 
-                  className="text-gray-700 font-medium hover:text-purple-600 transition"
+                  className="text-gray-700 font-medium hover:text-blue-600 transition"
                 >
                   {link}
                 </a>
@@ -131,7 +131,7 @@ export default function Footer() {
                   <a 
                     key={idx}
                     href="#" 
-                    className="block text-gray-700 hover:text-purple-600 transition text-sm"
+                    className="block text-gray-700 hover:text-blue-600 transition text-sm"
                   >
                     {lang.name}
                   </a>
@@ -146,11 +146,11 @@ export default function Footer() {
       <div className="bg-white border-t border-gray-200 py-6 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-            <a href="#" className="hover:text-purple-600 transition">Notice of privacy practices</a>
-            <span>·</span>
-            <a href="#" className="hover:text-purple-600 transition">Terms of use and site privacy</a>
-            <span>·</span>
-            <a href="#" className="hover:text-purple-600 transition">Statement of nondiscrimination</a>
+            <a href="#" className="hover:text-blue-600 transition">Notice of privacy practices</a>
+            <span>•</span>
+            <a href="#" className="hover:text-blue-600 transition">Terms of use and site privacy</a>
+            <span>•</span>
+            <a href="#" className="hover:text-blue-600 transition">Statement of nondiscrimination</a>
           </div>
           
           <div className="flex items-center gap-2">

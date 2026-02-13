@@ -12,6 +12,8 @@ export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -32,6 +34,10 @@ export default function ServicesPage() {
 
     fetchServices();
   }, []);
+
+  const totalPages = Math.ceil(services.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const displayedServices = services.slice(startIndex, startIndex + itemsPerPage);
   return (
     <div className="min-h-screen bg-gray-100">
      <Header/>
@@ -63,7 +69,7 @@ export default function ServicesPage() {
           {loading && (
             <div className="flex justify-center items-center py-12">
               <div className="text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-4"></div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
                 <p className="text-gray-600">Loading services...</p>
               </div>
             </div>
@@ -76,35 +82,36 @@ export default function ServicesPage() {
             </div>
           )}
 
-          {!loading && !error && services.length === 0 && (
+          {!loading && services.length === 0 && (
             <div className="text-center py-12 text-gray-600">
               <p>No services available at the moment.</p>
             </div>
           )}
 
-          {!loading && services.map((service, index) => (
+          {!loading && displayedServices.map((service, index) => (
             <ServiceCard key={service._id || service.id || `service-${index}`} service={service} />
           ))}
         </div>
 
-        {/* See everything link - goes to another page */}
-        <div className="text-center mt-16 pt-8">
-          <Link 
-            href="/services/all"
-            className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:underline text-lg font-semibold transition-all group"
-          >
-            <span>See all our services</span>
-            <svg 
-              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
-        </div>
-
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-2 rounded font-medium transition ${
+                  currentPage === page
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+        
         {/* Footer spacing */}
       </div>
     </div>

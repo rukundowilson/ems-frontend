@@ -17,7 +17,7 @@ const FeatureCard = ({ icon, title, description, link }: FeatureCardProps) => {
         <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
         <p className="text-gray-600 mb-2">{description}</p>
         {link && (
-          <a href={link} className="text-purple-600 hover:text-purple-700 font-medium">
+          <a href={link} className="text-blue-600 hover:text-blue-700 font-medium">
             {link} →
           </a>
         )}

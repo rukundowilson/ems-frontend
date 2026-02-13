@@ -107,7 +107,7 @@ export default function BookingSearchPage() {
         <div className="mb-8">
           <Link
             href="/get-started"
-            className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-semibold mb-4"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-4"
           >
             <ChevronLeft className="w-5 h-5" />
             Back
@@ -126,7 +126,7 @@ export default function BookingSearchPage() {
                   placeholder="Enter your booking ID (e.g., 507f1f77bcf86cd799439011)"
                   value={searchId}
                   onChange={(e) => setSearchId(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <button
@@ -177,7 +177,7 @@ export default function BookingSearchPage() {
               {/* Receipt Header */}
               <div className="flex items-center justify-between border-b pb-4 mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-800 rounded-md flex items-center justify-center text-white font-bold text-xl">EMS</div>
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-md flex items-center justify-center text-white font-bold text-xl">EMS</div>
                   <div>
                     <div className="text-lg font-bold text-gray-900">EMS Clinic</div>
                     <div className="text-xs text-gray-600">Healthcare Services</div>

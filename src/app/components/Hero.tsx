@@ -40,7 +40,7 @@ const VirtuwellHero: React.FC = () => {
       {/* Hero Section */}
       <div className="grid md:grid-cols-2">
         {/* Left side - Phone mockup */}
-        <div className="bg-gradient-to-br from-purple-100 to-pink-100 py-16 px-4 sm:px-6 lg:px-12 flex items-center">
+        <div className="bg-gradient-to-br from-blue-100 to-blue-50 py-16 px-4 sm:px-6 lg:px-12 flex items-center">
           <div className="w-full max-w-sm mx-auto">
             {/* PhoneMockup component inserted here */}
             <PhoneMockup />
@@ -73,7 +73,7 @@ const VirtuwellHero: React.FC = () => {
 
             {/* CTA Button */}
             <div>
-              <Link href="/get-started" className="btn-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center gap-3 inline-block text-center">
+              <Link href="/get-started" className="btn-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center gap-3 inline-block text-center">
                 Get started
                 <span className="text-2xl">›</span>
               </Link>
@@ -96,7 +96,7 @@ const VirtuwellHero: React.FC = () => {
                   ))}
                 </div>
               </div>
-              <a href="#" className="text-purple-600 hover:text-purple-700 font-medium text-sm flex items-center gap-1">
+              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1">
                 View all 125750 reviews
                 <span className="text-lg">›</span>
               </a>

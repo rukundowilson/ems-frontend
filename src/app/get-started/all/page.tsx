@@ -199,13 +199,13 @@ export default function AllServicesPage() {
       </div>
 
       {/* Bottom CTA Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-20">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-sm font-medium mb-2">We're here to help</p>
           <h2 className="text-4xl font-bold mb-8">Ready to give us a try?</h2>
           <Link 
             href="/services"
-            className="inline-block bg-white text-purple-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors"
+            className="inline-block bg-white text-blue-600 px-8 py-3 rounded-md font-semibold hover:bg-gray-100 transition-colors"
           >
             Get started →
           </Link>

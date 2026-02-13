@@ -95,7 +95,7 @@ function SignInContent() {
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>
@@ -113,7 +113,7 @@ function SignInContent() {
                   placeholder="John Doe"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required={isSignUp}
                 />
               </div>
@@ -132,7 +132,7 @@ function SignInContent() {
                   placeholder="+1 (555) 123-4567"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             )}
@@ -149,7 +149,7 @@ function SignInContent() {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
               <button
@@ -165,7 +165,7 @@ function SignInContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-semibold py-3 rounded-lg transition-all"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-all"
             >
               {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
             </button>
@@ -176,7 +176,7 @@ function SignInContent() {
             {!isSignUp && (
               <p>
                 Don't have an account?{" "}
-                <button onClick={() => setIsSignUp(true)} className="text-purple-600 hover:text-purple-700 font-semibold">
+                <button onClick={() => setIsSignUp(true)} className="text-blue-600 hover:text-blue-700 font-semibold">
                   Sign up here
                 </button>
               </p>
@@ -184,7 +184,7 @@ function SignInContent() {
             {isSignUp && (
               <p>
                 Already have an account?{" "}
-                <button onClick={() => setIsSignUp(false)} className="text-purple-600 hover:text-purple-700 font-semibold">
+                <button onClick={() => setIsSignUp(false)} className="text-blue-600 hover:text-blue-700 font-semibold">
                   Sign in here
                 </button>
               </p>
