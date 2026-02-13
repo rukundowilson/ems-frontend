@@ -111,7 +111,6 @@ export default function BookingsListPage() {
           ) : (
             <div className="text-sm text-gray-500">No services assigned</div>
           )}
-          <button onClick={() => setSelectedService(null)} className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">All</button>
         </div>
 
         <div className="space-y-4">

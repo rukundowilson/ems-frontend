@@ -60,7 +60,7 @@ export default function AvailabilityCalendar() {
   const [startTime, setStartTime] = React.useState('09:00');
   const [endTime, setEndTime] = React.useState('10:00');
   const [timeRows, setTimeRows] = React.useState<{ start: string; end: string }[]>([{ start: '09:00', end: '10:00' }]);
-  const [editingId, setEditingId] = React.useState<number | null>(null);
+  const [editingId, setEditingId] = React.useState<string | null>(null);
   const [showModal, setShowModal] = React.useState(false);
 
   React.useEffect(() => {
@@ -107,9 +107,9 @@ export default function AvailabilityCalendar() {
       if (tr.start >= tr.end) return alert('Start must be before end');
       
       try {
-        const res = await api.put(`/availability/${editingId}`, { date: selectedDate, start: tr.start, end: tr.end });
+        const res = await api.patch(`/availability/${editingId}`, { date: selectedDate, start: tr.start, end: tr.end });
         const updatedSlot = res.data.data;
-        setSlots((prev) => prev.map((s) => (String(s._id) === String(editingId) || String(s.id) === String(editingId) ? updatedSlot : s)));
+        setSlots((prev) => prev.map((s) => ((String(s._id) === String(editingId) || String(s.id) === String(editingId)) ? updatedSlot : s)));
         clearForm();
       } catch (err) {
         alert('Failed to update slot: ' + (err as Error).message);
@@ -131,7 +131,7 @@ export default function AvailabilityCalendar() {
 
     try {
       const doctorId = getDoctorId();
-      const res = await api.post('/availability', { date: selectedDate, slots: timeRows, doctorId });
+      const res = await api.post('/availability', { date: selectedDate, slots: timeRows }, { params: { doctorId } });
       const newData = res.data.data;
       setSlots((prev) => [...prev, ...newData].sort((a, b) => ((a.date || '') + (a.start || '') > (b.date || '') + (b.start || '') ? 1 : -1)));
       clearForm();
@@ -145,7 +145,8 @@ export default function AvailabilityCalendar() {
     setStartTime(s.start);
     setEndTime(s.end);
     setTimeRows([{ start: s.start, end: s.end }]);
-    setEditingId(s.id ?? null);
+    const idVal = s._id ?? s.id ?? null;
+    setEditingId(idVal ? String(idVal) : null);
     setShowModal(true);
   }
 
@@ -157,7 +158,7 @@ export default function AvailabilityCalendar() {
     (async () => {
       try {
         await api.delete(`/availability/${deleteId}`);
-        setSlots((prev) => prev.filter((s) => s._id !== deleteId && s.id !== id));
+        setSlots((prev) => prev.filter((s) => String(s._id) !== deleteId && String(s.id) !== deleteId));
       } catch (err) {
         alert('Failed to delete: ' + (err as Error).message);
       }
