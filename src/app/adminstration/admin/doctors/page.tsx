@@ -76,14 +76,14 @@ export default function DoctorsPage() {
   const handleEdit = (doctor: any) => {
     setModalMode("edit");
     setSelectedDoctor(doctor);
-    setFormData(doctor);
+    setFormData({ ...doctor, password: doctor.password || "" });
     setShowModal(true);
   };
 
   const handleView = (doctor: any) => {
     setModalMode("view");
     setSelectedDoctor(doctor);
-    setFormData(doctor);
+    setFormData({ ...doctor, password: doctor.password || "" });
     setShowModal(true);
   };
 
