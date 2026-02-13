@@ -1,0 +1,424 @@
+[33mcommit f2c6666fbcfc6c059b38beaa2e56afce37a3d090[m
+Author: Assumpta-tech <uwamariya.assumpta@yahoo.com>
+Date:   Thu Feb 12 09:39:22 2026 +0200
+
+    admin dashboard intergration
+
+[1mdiff --git a/src/app/adminstration/admin/appointments/page.tsx b/src/app/adminstration/admin/appointments/page.tsx[m
+[1mindex 453dc1f..4602947 100644[m
+[1m--- a/src/app/adminstration/admin/appointments/page.tsx[m
+[1m+++ b/src/app/adminstration/admin/appointments/page.tsx[m
+[36m@@ -1,87 +1,159 @@[m
+ "use client";[m
+ [m
+[31m-import React, { useState } from "react";[m
+[32m+[m[32mimport React, { useState, useEffect } from "react";[m
+ import { Search, Filter, UserPlus, X } from "lucide-react";[m
+ [m
+[31m-const dummyAppointments = [[m
+[31m-  {[m
+[31m-    id: 1,[m
+[31m-    patient: "John Doe",[m
+[31m-    service: "General Consultation",[m
+[31m-    date: "2024-02-10",[m
+[31m-    time: "10:00 AM",[m
+[31m-    status: "Pending",[m
+[31m-    assignedDoctor: null,[m
+[31m-  },[m
+[31m-  {[m
+[31m-    id: 2,[m
+[31m-    patient: "Jane Wilson",[m
+[31m-    service: "Cardiology Checkup",[m
+[31m-    date: "2024-02-10",[m
+[31m-    time: "11:30 AM",[m
+[31m-    status: "Assigned",[m
+[31m-    assignedDoctor: "Dr. Sarah Smith",[m
+[31m-  },[m
+[31m-  {[m
+[31m-    id: 3,[m
+[31m-    patient: "Mike Brown",[m
+[31m-    service: "Neurology Consultation",[m
+[31m-    date: "2024-02-11",[m
+[31m-    time: "2:00 PM",[m
+[31m-    status: "Pending",[m
+[31m-    assignedDoctor: null,[m
+[31m-  },[m
+[31m-];[m
+[31m-[m
+[31m-const availableDoctors = [[m
+[31m-  "Dr. Sarah Smith",[m
+[31m-  "Dr. John Johnson",[m
+[31m-  "Dr. Emily Davis",[m
+[31m-];[m
+[32m+[m[32minterface Booking {[m
+[32m+[m[32m  _id: string;[m
+[32m+[m[32m  doctorId: string;[m
+[32m+[m[32m  patientId?: string;[m
+[32m+[m[32m  service: string;[m
+[32m+[m[32m  date: string;[m
+[32m+[m[32m  time: string;[m
+[32m+[m[32m  patientEmail?: string;[m
+[32m+[m[32m  patientName?: string;[m
+[32m+[m[32m  patientPhone?: string;[m
+[32m+[m[32m  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32minterface Doctor {[m
+[32m+[m[32m  _id: string;[m
+[32m+[m[32m  name: string;[m
+[32m+[m[32m  email: string;[m
+[32m+[m[32m  specialization?: string;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mconst API_BASE = "http://localhost:4000/api";[m
+ [m
+ export default function AppointmentsPage() {[m
+[31m-  const [appointments, setAppointments] = useState(dummyAppointments);[m
+[32m+[m[32m  const [appointments, setAppointments] = useState<Booking[]>([]);[m
+[32m+[m[32m  const [doctors, setDoctors] = useState<Doctor[]>([]);[m
+   const [searchTerm, setSearchTerm] = useState("");[m
+   const [filterStatus, setFilterStatus] = useState("All");[m
+   const [showAssignModal, setShowAssignModal] = useState(false);[m
+[31m-  const [selectedAppointment, setSelectedAppointment] = useState<number | null>(null);[m
+[32m+[m[32m  const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);[m
+   const [selectedDoctor, setSelectedDoctor] = useState("");[m
+[32m+[m[32m  const [loading, setLoading] = useState(false);[m
+[32m+[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    fetchAppointments();[m
+[32m+[m[32m    fetchDoctors();[m
+[32m+[m[32m  }, []);[m
+ [m
+[31m-  const handleAssignDoctor = (appointmentId: number) => {[m
+[32m+[m[32m  const fetchAppointments = async () => {[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const res = await fetch(`${API_BASE}/bookings`);[m
+[32m+[m[32m      const data = await res.json();[m
+[32m+[m[32m      console.log('Appointments data:', data);[m
+[32m+[m[32m      if (data.success) {[m
+[32m+[m[32m        setAppointments(data.data);[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        console.error('Failed to fetch appointments:', data.error);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (err) {[m
+[32m+[m[32m      console.error("Failed to fetch appointments", err);[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const fetchDoctors = async () => {[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const res = await fetch(`${API_BASE}/doctors`);[m
+[32m+[m[32m      const data = await res.json();[m
+[32m+[m[32m      console.log('Doctors data:', data);[m
+[32m+[m[32m      if (data.success) {[m
+[32m+[m[32m        setDoctors(data.data);[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        console.error('Failed to fetch doctors:', data.error);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (err) {[m
+[32m+[m[32m      console.error("Failed to fetch doctors", err);[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleAssignDoctor = (appointmentId: string) => {[m
+     setSelectedAppointment(appointmentId);[m
+     setShowAssignModal(true);[m
+   };[m
+ [m
+[31m-  const confirmAssign = () => {[m
+[31m-    if (selectedAppointment && selectedDoctor) {[m
+[31m-      setAppointments([m
+[31m-        appointments.map((apt) =>[m
+[31m-          apt.id === selectedAppointment[m
+[31m-            ? { ...apt, assignedDoctor: selectedDoctor, status: "Assigned" }[m
+[31m-            : apt[m
+[31m-        )[m
+[31m-      );[m
+[31m-      setShowAssignModal(false);[m
+[31m-      setSelectedDoctor("");[m
+[32m+[m[32m  const confirmAssign = async () => {[m
+[32m+[m[32m    if (!selectedAppointment || !selectedDoctor) return;[m
+[32m+[m[32m    setLoading(true);[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const res = await fetch(`${API_BASE}/bookings/${selectedAppointment}`, {[m
+[32m+[m[32m        method: "PATCH",[m
+[32m+[m[32m        headers: { "Content-Type": "application/json" },[m
+[32m+[m[32m        body: JSON.stringify({ doctorId: selectedDoctor, status: "confirmed" }),[m
+[32m+[m[32m      });[m
+[32m+[m[32m      const data = await res.json();[m
+[32m+[m[32m      if (data.success) {[m
+[32m+[m[32m        setAppointments([m
+[32m+[m[32m          appointments.map((apt) =>[m
+[32m+[m[32m            apt._id === selectedAppointment ? data.data : apt[m
+[32m+[m[32m          )[m
+[32m+[m[32m        );[m
+[32m+[m[32m        setShowAssignModal(false);[m
+[32m+[m[32m        setSelectedDoctor("");[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        alert(data.error || "Failed to assign doctor");[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (err) {[m
+[32m+[m[32m      alert("Failed to assign doctor");[m
+[32m+[m[32m    } finally {[m
+[32m+[m[32m      setLoading(false);[m
+     }[m
+   };[m
+ [m
+[31m-  const handleReject = (id: number) => {[m
+[31m-    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "Rejected" } : apt)));[m
+[32m+[m[32m  const handleReject = async (id: string) => {[m
+[32m+[m[32m    if (!confirm("Are you sure you want to reject this appointment?")) return;[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const res = await fetch(`${API_BASE}/bookings/${id}`, {[m
+[32m+[m[32m        method: "PATCH",[m
+[32m+[m[32m        headers: { "Content-Type": "application/json" },[m
+[32m+[m[32m        body: JSON.stringify({ status: "cancelled" }),[m
+[32m+[m[32m      });[m
+[32m+[m[32m      const data = await res.json();[m
+[32m+[m[32m      if (data.success) {[m
+[32m+[m[32m        setAppointments(appointments.map((apt) => (apt._id === id ? data.data : apt)));[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        alert(data.error || "Failed to reject appointment");[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (err) {[m
+[32m+[m[32m      alert("Failed to reject appointment");[m
+[32m+[m[32m    }[m
+   };[m
+ [m
+[31m-  const handleCancel = (id: number) => {[m
+[31m-    setAppointments(appointments.map((apt) => (apt.id === id ? { ...apt, status: "Cancelled" } : apt)));[m
+[32m+[m[32m  const handleCancel = async (id: string) => {[m
+[32m+[m[32m    if (!confirm("Are you sure you want to cancel this appointment?")) return;[m
+[32m+[m[32m    try {[m
+[32m+[m[32m      const res = await fetch(`${API_BASE}/bookings/${id}`, {[m
+[32m+[m[32m        method: "PATCH",[m
+[32m+[m[32m        headers: { "Content-Type": "application/json" },[m
+[32m+[m[32m        body: JSON.stringify({ status: "cancelled" }),[m
+[32m+[m[32m      });[m
+[32m+[m[32m      const data = await res.json();[m
+[32m+[m[32m      if (data.success) {[m
+[32m+[m[32m        setAppointments(appointments.map((apt) => (apt._id === id ? data.data : apt)));[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        alert(data.error || "Failed to cancel appointment");[m
+[32m+[m[32m      }[m
+[32m+[m[32m    } catch (err) {[m
+[32m+[m[32m      alert("Failed to cancel appointment");[m
+[32m+[m[32m    }[m
+   };[m
+ [m
+   const filteredAppointments = appointments.filter((apt) => {[m
+[31m-    const matchesSearch = apt.patient.toLowerCase().includes(searchTerm.toLowerCase());[m
+[31m-    const matchesFilter = filterStatus === "All" || apt.status === filterStatus;[m
+[32m+[m[32m    const matchesSearch = apt.patientName?.toLowerCase().includes(searchTerm.toLowerCase()) || false;[m
+[32m+[m[32m    const matchesFilter = filterStatus === "All" || apt.status === filterStatus.toLowerCase();[m
+     return matchesSearch && matchesFilter;[m
+   });[m
+ [m
+[32m+[m[32m  const getDoctorName = (doctorId: string) => {[m
+[32m+[m[32m    const doctor = doctors.find(d => d._id === doctorId);[m
+[32m+[m[32m    return doctor ? doctor.name : "Not assigned";[m
+[32m+[m[32m  };[m
+[32m+[m
+   return ([m
+[31m-    <div className="p-8">[m
+[32m+[m[32m    <div className="p-8" suppressHydrationWarning>[m
+       <div className="mb-6">[m
+         <h1 className="text-3xl font-bold text-gray-800">Appointments Management</h1>[m
+         <p className="text-gray-600 mt-1">Assign doctors, approve or reject appointments</p>[m
+[36m@@ -96,6 +168,7 @@[m [mexport default function AppointmentsPage() {[m
+             value={searchTerm}[m
+             onChange={(e) => setSearchTerm(e.target.value)}[m
+             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"[m
+[32m+[m[32m            suppressHydrationWarning[m
+           />[m
+         </div>[m
+         <div className="flex items-center gap-2">[m
+[36m@@ -104,12 +177,12 @@[m [mexport default function AppointmentsPage() {[m
+             value={filterStatus}[m
+             onChange={(e) => setFilterStatus(e.target.value)}[m
+             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"[m
+[32m+[m[32m            suppressHydrationWarning[m
+           >[m
+             <option>All</option>[m
+             <option>Pending</option>[m
+[31m-            <option>Assigned</option>[m
+             <option>Confirmed</option>[m
+[31m-            <option>Rejected</option>[m
+[32m+[m[32m            <option>Completed</option>[m
+             <option>Cancelled</option>[m
+           </select>[m
+         </div>[m
+[36m@@ -128,54 +201,61 @@[m [mexport default function AppointmentsPage() {[m
+             </tr>[m
+           </thead>[m
+           <tbody>[m
+[31m-            {filteredAppointments.map((apt) => ([m
+[31m-              <tr key={apt.id} className="border-b hover:bg-gray-50">[m
+[31m-                <td className="py-4 px-6 font-medium">{apt.patient}</td>[m
+[32m+[m[32m            {filteredAppointments.length === 0 ? ([m
+[32m+[m[32m              <tr>[m
+[32m+[m[32m                <td colSpan={6} className="py-8 px-6 text-center text-gray-500">[m
+[32m+[m[32m                  {appointments.length === 0 ? "No appointments found in the database." : "No appointments match your search criteria."}[m
+[32m+[m[32m                </td>[m
+[32m+[m[32m              </tr>[m
+[32m+[m[32m            ) : ([m
+[32m+[m[32m              filteredAppointments.map((apt) => ([m
+[32m+[m[32m              <tr key={apt._id} className="border-b hover:bg-gray-50">[m
+[32m+[m[32m                <td className="py-4 px-6 font-medium">{apt.patientName || apt.patientEmail || "N/A"}</td>[m
+                 <td className="py-4 px-6">{apt.service}</td>[m
+                 <td className="py-4 px-6">[m
+                   {apt.date} <br />[m
+                   <span className="text-sm text-gray-500">{apt.time}</span>[m
+                 </td>[m
+                 <td className="py-4 px-6">[m
+[31m-                  {apt.assignedDoctor || <span className="text-gray-400 italic">Not assigned</span>}[m
+[32m+[m[32m                  {getDoctorName(apt.doctorId)}[m
+                 </td>[m
+                 <td className="py-4 px-6">[m
+                   <span[m
+                     className={`px-3 py-1 rounded-full text-xs font-semibold ${[m
+[31m-                      apt.status === "Pending"[m
+[32m+[m[32m                      apt.status === "pending"[m
+                         ? "bg-orange-100 text-orange-600"[m
+[31m-                        : apt.status === "Assigned"[m
+[31m-                          ? "bg-blue-100 text-blue-600"[m
+[31m-                          : apt.status === "Confirmed"[m
+[31m-                            ? "bg-green-100 text-green-600"[m
+[32m+[m[32m                        : apt.status === "confirmed"[m
+[32m+[m[32m                          ? "bg-green-100 text-green-600"[m
+[32m+[m[32m                          : apt.status === "completed"[m
+[32m+[m[32m                            ? "bg-blue-100 text-blue-600"[m
+                             : "bg-red-100 text-red-600"[m
+                     }`}[m
+                   >[m
+[31m-                    {apt.status}[m
+[32m+[m[32m                    {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}[m
+                   </span>[m
+                 </td>[m
+                 <td className="py-4 px-6">[m
+                   <div className="flex gap-2">[m
+[31m-                    {apt.status === "Pending" && ([m
+[32m+[m[32m                    {apt.status === "pending" && ([m
+                       <>[m
+                         <button[m
+[31m-                          onClick={() => handleAssignDoctor(apt.id)}[m
+[32m+[m[32m                          onClick={() => handleAssignDoctor(apt._id)}[m
+                           className="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1"[m
+                         >[m
+                           <UserPlus className="w-4 h-4" />[m
+                           Assign[m
+                         </button>[m
+                         <button[m
+[31m-                          onClick={() => handleReject(apt.id)}[m
+[32m+[m[32m                          onClick={() => handleReject(apt._id)}[m
+                           className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"[m
+                         >[m
+                           Reject[m
+                         </button>[m
+                       </>[m
+                     )}[m
+[31m-                    {(apt.status === "Assigned" || apt.status === "Confirmed") && ([m
+[32m+[m[32m                    {(apt.status === "confirmed" || apt.status === "completed") && ([m
+                       <button[m
+[31m-                        onClick={() => handleCancel(apt.id)}[m
+[32m+[m[32m                        onClick={() => handleCancel(apt._id)}[m
+                         className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"[m
+                       >[m
+                         Cancel[m
+[36m@@ -184,7 +264,7 @@[m [mexport default function AppointmentsPage() {[m
+                   </div>[m
+                 </td>[m
+               </tr>[m
+[31m-            ))}[m
+[32m+[m[32m            )))}[m
+           </tbody>[m
+         </table>[m
+       </div>[m
+[36m@@ -206,11 +286,12 @@[m [mexport default function AppointmentsPage() {[m
+                 value={selectedDoctor}[m
+                 onChange={(e) => setSelectedDoctor(e.target.value)}[m
+                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"[m
+[32m+[m[32m                suppressHydrationWarning[m
+               >[m
+                 <option value="">Choose a doctor...</option>[m
+[31m-                {availableDoctors.map((doc) => ([m
+[31m-                  <option key={doc} value={doc}>[m
+[31m-                    {doc}[m
+[32m+[m[32m                {doctors.map((doc) => ([m
+[32m+[m[32m                  <option key={doc._id} value={doc._id}>[m
+[32m+[m[32m                    {doc.name} {doc.specialization ? `- ${doc.specialization}` : ""}[m
+                   </option>[m
+                 ))}[m
+               </select>[m
+[36m@@ -218,14 +299,15 @@[m [mexport default function AppointmentsPage() {[m
+             <div className="flex gap-2">[m
+               <button[m
+                 onClick={confirmAssign}[m
+[31m-                disabled={!selectedDoctor}[m
+[32m+[m[32m                disabled={!selectedDoctor || loading}[m
+                 className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-300 text-white py-2 rounded-lg"[m
+               >[m
+[31m-                Confirm[m
+[32m+[m[32m                {loading ? "Assigning..." : "Confirm"}[m
+               </button>[m
+               <button[m
+                 onClick={() => setShowAssignModal(false)}[m
+[31m-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg"[m
+[32m+[m[32m                disabled={loading}[m
+[32m+[m[32m                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg disabled:opacity-50"[m
+               >[m
+                 Cancel[m
+               </button>[m
+[1mdiff --git a/src/app/adminstration/admin/layout.tsx b/src/app/adminstration/admin/layout.tsx[m
+[1mindex 66168bc..78b2742 100644[m
+[1m--- a/src/app/adminstration/admin/layout.tsx[m
+[1m+++ b/src/app/adminstration/admin/layout.tsx[m
+[36m@@ -19,12 +19,14 @@[m [mexport default function AdminLayout({[m
+ }) {[m
+   const pathname = usePathname();[m
+   const router = useRouter();[m
+[32m+[m[32m  const [mounted, setMounted] = useState(false);[m
+ [m
+   const [user, setUser] = useState<{ name?: string; avatar?: string } | null>([m
+     null,[m
+   );[m
+ [m
+   useEffect(() => {[m
+[32m+[m[32m    setMounted(true);[m
+     if (typeof window === "undefined") return;[m
+     const raw = localStorage.getItem("user_data");[m
+     if (!raw) return;[m
+[36m@@ -46,7 +48,7 @@[m [mexport default function AdminLayout({[m
+     : "A";[m
+ [m
+   return ([m
+[31m-    <div className="flex h-screen bg-gray-50">[m
+[32m+[m[32m    <div className="flex h-screen bg-gray-50" suppressHydrationWarning>[m
+       <div className="w-28 bg-gradient-to-b from-blue-900 to-blue-700 text-white flex flex-col items-center py-6 space-y-8 fixed h-screen z-40">[m
+         <div[m
+           className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center font-bold text-blue-900 text-xl overflow-hidden"[m
+[36m@@ -110,13 +112,14 @@[m [mexport default function AdminLayout({[m
+             }}[m
+             className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-400 transition"[m
+             title="Logout"[m
+[32m+[m[32m            suppressHydrationWarning[m
+           >[m
+             <LogOut className="w-5 h-5 text-white" />[m
+           </button>[m
+         </div>[m
+       </div>[m
+ [m
+[31m-      <div className="flex-1 ml-28 overflow-auto">{children}</div>[m
+[32m+[m[32m      <div className="flex-1 ml-28 overflow-auto" suppressHydrationWarning>{children}</div>[m
+     </div>[m
+   );[m
+ }[m
+[1mdiff --git a/src/app/adminstration/admin/services/page.tsx b/src/app/adminstration/admin/services/page.tsx[m
+[1mindex 5d9bf98..75e956a 100644[m
+[1m--- a/src/app/adminstration/admin/services/page.tsx[m
+[1m+++ b/src/app/adminstration/admin/services/page.tsx[m
+[36m@@ -1,44 +1,110 @@[m
+ "use client";[m
+ [m
+[31m-import React, { useState } from "react";[m
+[32m+[m

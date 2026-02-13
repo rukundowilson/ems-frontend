@@ -27,6 +27,10 @@ export default function AdminOverview() {
   const { data: services, isLoading: loadingServices, error: servicesError } = useServices();
   const { data: bookings, isLoading: loadingBookings } = useBookings();
 
+  const totalDoctors = doctors?.length || 0;
+  const totalPatients = patients?.length || 0;
+  const totalServices = services?.length || 0;
+
   const hasError = patientsError || doctorsError || servicesError;
 
   if (hasError) {
@@ -46,10 +50,6 @@ export default function AdminOverview() {
       </div>
     );
   }
-
-  const totalDoctors = doctors?.length || 0;
-  const totalPatients = patients?.length || 0;
-  const totalServices = services?.length || 0;
 
   const bookingStats = useMemo(() => {
     if (!bookings) return { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
