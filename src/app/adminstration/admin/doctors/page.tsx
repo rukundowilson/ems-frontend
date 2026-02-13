@@ -53,6 +53,7 @@ export default function DoctorsPage() {
     availability: "",
     phone: "",
     email: "",
+    password: "",
     status: "Active",
   });
 
@@ -66,6 +67,7 @@ export default function DoctorsPage() {
       availability: "",
       phone: "",
       email: "",
+      password: "",
       status: "Active",
     });
     setShowModal(true);
