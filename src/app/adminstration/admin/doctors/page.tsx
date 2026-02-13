@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Plus, X, Trash2 } from "lucide-react";
+import { Search, Plus, X, Trash2, Edit, Eye } from "lucide-react";
 import { useDoctors, useUpdateDoctor, useCreateDoctor, useDeleteDoctor, useServices } from "@/app/shared/hooks/useAdminData";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 const dummyDoctors = [
   {
@@ -46,6 +47,7 @@ export default function DoctorsPage() {
   const updateDoctor = useUpdateDoctor();
   const createDoctor = useCreateDoctor();
   const deleteDoctor = useDeleteDoctor();
+  const { darkMode } = useTheme();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -163,10 +165,10 @@ export default function DoctorsPage() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Doctors Management</h1>
-          <p className="text-gray-600 mt-1">Manage doctor profiles and availability</p>
+          <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Doctors Management</h1>
+          <p className={`mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manage doctor profiles and availability</p>
         </div>
-        <button onClick={handleAdd} className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button onClick={handleAdd} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <Plus className="w-5 h-5" />
           Add Doctor
         </button>
@@ -180,14 +182,14 @@ export default function DoctorsPage() {
             placeholder="Search doctors..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDoctors.map((doctor: any) => (
-          <div key={doctor._id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+          <div key={doctor._id} className={`rounded-xl shadow-md p-6 hover:shadow-lg transition ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex items-start justify-between mb-4">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xl">
                 {doctor.name?.split(" ")[1]?.[0] || doctor.name?.charAt(0) || 'D'}
@@ -202,42 +204,59 @@ export default function DoctorsPage() {
                 {doctor.status || 'Active'}
               </span>
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-1">{doctor.name || 'N/A'}</h3>
-            <p className="text-sm text-gray-600 mb-1">{doctor.title || 'N/A'}</p>
+            <h3 className={`text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>{doctor.name || 'N/A'}</h3>
+            <p className={`text-sm mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{doctor.title || 'N/A'}</p>
             <p className="text-sm text-teal-600 font-semibold mb-3">{doctor.role}</p>
             
             <div className="space-y-2 text-sm">
               <div>
-                <span className="text-gray-500">Specialization:</span>
-                <span className="text-gray-800 ml-2">{doctor.specialization || 'N/A'}</span>
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Specialization:</span>
+                <span className={`ml-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{doctor.specialization || 'N/A'}</span>
               </div>
               <div>
-                <span className="text-gray-500">Availability:</span>
-                <span className="text-gray-800 ml-2">{doctor.availability || 'N/A'}</span>
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Availability:</span>
+                <span className={`ml-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{doctor.availability || 'N/A'}</span>
               </div>
               <div>
-                <span className="text-gray-500">Phone:</span>
-                <span className="text-gray-800 ml-2">{doctor.phone || 'N/A'}</span>
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Phone:</span>
+                <span className={`ml-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{doctor.phone || 'N/A'}</span>
               </div>
               <div>
-                <span className="text-gray-500">Email:</span>
-                <span className="text-gray-800 ml-2 text-xs">{doctor.email || 'N/A'}</span>
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Email:</span>
+                <span className={`ml-2 text-xs ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{doctor.email || 'N/A'}</span>
               </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t flex gap-2">
-              <button onClick={() => handleEdit(doctor)} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg text-sm">
-                Edit
+            <div className={`mt-4 pt-4 border-t flex justify-between items-center ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <button 
+                onClick={() => handleEdit(doctor)} 
+                className="group relative bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg transition-all"
+                title="Edit"
+              >
+                <Edit className="w-5 h-5" />
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Edit
+                </span>
               </button>
-              <button onClick={() => handleView(doctor)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg text-sm">
-                View Details
+              <button 
+                onClick={() => handleView(doctor)} 
+                className="group relative bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-lg transition-all"
+                title="View"
+              >
+                <Eye className="w-5 h-5" />
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  View
+                </span>
               </button>
               <button 
                 onClick={() => handleDelete(doctor._id, doctor.name)} 
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm"
+                className="group relative bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all cursor-pointer"
                 title="Delete"
               >
-                Delete
+                <Trash2 className="w-5 h-5" />
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Delete
+                </span>
               </button>
             </div>
           </div>
@@ -376,7 +395,7 @@ export default function DoctorsPage() {
                 <button 
                   onClick={handleSubmit} 
                   disabled={createDoctor.isPending || updateDoctor.isPending}
-                  className="flex-1 bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-lg disabled:opacity-50"
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg disabled:opacity-50"
                 >
                   {createDoctor.isPending || updateDoctor.isPending ? 'Saving...' : modalMode === "add" ? "Add" : "Save"}
                 </button>

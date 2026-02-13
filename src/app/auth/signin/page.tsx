@@ -52,6 +52,8 @@ function SignInContent() {
       // Redirect to specified URL or based on detected role
       if (redirectUrl) {
         router.push(redirectUrl);
+      } else if (detectedRole === "admin") {
+        router.push("/adminstration/admin");
       } else if (detectedRole === "doctor") {
         router.push("/adminstration/doctor");
       } else {

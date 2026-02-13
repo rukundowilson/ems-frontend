@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { usePatients, useUpdatePatient, useDeletePatient, useCreatePatient } from "@/app/shared/hooks/useAdminData";
 import { Search, Edit, Trash2, X, Plus } from "lucide-react";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 export default function PatientsPage() {
   const { data: patients, isLoading } = usePatients();
   const updatePatient = useUpdatePatient();
   const deletePatient = useDeletePatient();
   const createPatient = useCreatePatient();
+  const { darkMode } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [editingPatient, setEditingPatient] = useState<any>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -61,8 +63,8 @@ export default function PatientsPage() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Patients</h1>
-          <p className="text-gray-600 mt-2">Manage all patients in the system</p>
+          <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Patients</h1>
+          <p className={`mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manage all patients in the system</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -73,7 +75,7 @@ export default function PatientsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className={`rounded-xl shadow-md p-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -82,41 +84,41 @@ export default function PatientsPage() {
               placeholder="Search patients by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
         </div>
 
         {isLoading ? (
-          <p className="text-center py-8 text-gray-500">Loading patients...</p>
+          <p className={`text-center py-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Loading patients...</p>
         ) : filteredPatients?.length === 0 ? (
-          <p className="text-center py-8 text-gray-500">No patients found</p>
+          <p className={`text-center py-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No patients found</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-50 border-b-2 border-gray-200">
-                  <th className="text-left py-4 px-6 text-gray-700 font-semibold text-sm uppercase tracking-wider">Patient</th>
-                  <th className="text-left py-4 px-6 text-gray-700 font-semibold text-sm uppercase tracking-wider">Email</th>
-                  <th className="text-left py-4 px-6 text-gray-700 font-semibold text-sm uppercase tracking-wider">Phone</th>
-                  <th className="text-left py-4 px-6 text-gray-700 font-semibold text-sm uppercase tracking-wider">Gender</th>
-                  <th className="text-left py-4 px-6 text-gray-700 font-semibold text-sm uppercase tracking-wider">Date of Birth</th>
-                  <th className="text-center py-4 px-6 text-gray-700 font-semibold text-sm uppercase tracking-wider">Actions</th>
+                <tr className={`border-b-2 ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
+                  <th className={`text-left py-4 px-6 font-semibold text-sm uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Patient</th>
+                  <th className={`text-left py-4 px-6 font-semibold text-sm uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email</th>
+                  <th className={`text-left py-4 px-6 font-semibold text-sm uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Phone</th>
+                  <th className={`text-left py-4 px-6 font-semibold text-sm uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Gender</th>
+                  <th className={`text-left py-4 px-6 font-semibold text-sm uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Date of Birth</th>
+                  <th className={`text-center py-4 px-6 font-semibold text-sm uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className={`divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 {filteredPatients?.map((patient: any, index: number) => (
-                  <tr key={patient._id} className={`hover:bg-blue-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                  <tr key={patient._id} className={`transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-blue-50'} ${index % 2 === 0 ? (darkMode ? 'bg-gray-800' : 'bg-white') : (darkMode ? 'bg-gray-750' : 'bg-gray-50')}`}>
                     <td className="py-4 px-6">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-semibold mr-3">
                           {patient.name?.charAt(0) || 'P'}
                         </div>
-                        <p className="font-medium text-gray-900">{patient.name || 'N/A'}</p>
+                        <p className={`font-medium ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>{patient.name || 'N/A'}</p>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-gray-900">{patient.email || 'N/A'}</td>
-                    <td className="py-4 px-6 text-gray-900">{patient.phone || 'N/A'}</td>
+                    <td className={`py-4 px-6 ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>{patient.email || 'N/A'}</td>
+                    <td className={`py-4 px-6 ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>{patient.phone || 'N/A'}</td>
                     <td className="py-4 px-6">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                         patient.gender === 'male' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'
@@ -124,7 +126,7 @@ export default function PatientsPage() {
                         {patient.gender || 'N/A'}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-gray-900">{patient.dateOfBirth || 'N/A'}</td>
+                    <td className={`py-4 px-6 ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>{patient.dateOfBirth || 'N/A'}</td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-center gap-2">
                         <button

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Search, Filter, UserPlus, X } from "lucide-react";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 const dummyAppointments = [
   {
@@ -41,6 +42,7 @@ const availableDoctors = [
 
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState(dummyAppointments);
+  const { darkMode } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -83,8 +85,8 @@ export default function AppointmentsPage() {
   return (
     <div className="p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Appointments Management</h1>
-        <p className="text-gray-600 mt-1">Assign doctors, approve or reject appointments</p>
+        <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Appointments Management</h1>
+        <p className={`mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Assign doctors, approve or reject appointments</p>
       </div>
 
       <div className="flex gap-4 mb-6">
@@ -95,7 +97,7 @@ export default function AppointmentsPage() {
             placeholder="Search by patient name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -103,7 +105,7 @@ export default function AppointmentsPage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
           >
             <option>All</option>
             <option>Pending</option>
@@ -115,29 +117,29 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className={`rounded-xl shadow-md overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className={darkMode ? 'bg-gray-700' : 'bg-gray-50'}>
             <tr>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Patient</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Service</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Date & Time</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Assigned Doctor</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Status</th>
-              <th className="text-left py-4 px-6 text-gray-600 font-semibold">Actions</th>
+              <th className={`text-left py-4 px-6 font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Patient</th>
+              <th className={`text-left py-4 px-6 font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Service</th>
+              <th className={`text-left py-4 px-6 font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Date & Time</th>
+              <th className={`text-left py-4 px-6 font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Assigned Doctor</th>
+              <th className={`text-left py-4 px-6 font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Status</th>
+              <th className={`text-left py-4 px-6 font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredAppointments.map((apt) => (
-              <tr key={apt.id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-6 font-medium">{apt.patient}</td>
-                <td className="py-4 px-6">{apt.service}</td>
-                <td className="py-4 px-6">
+              <tr key={apt.id} className={`border-b transition-colors ${darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <td className={`py-4 px-6 font-medium ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>{apt.patient}</td>
+                <td className={`py-4 px-6 ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>{apt.service}</td>
+                <td className={`py-4 px-6 ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                   {apt.date} <br />
-                  <span className="text-sm text-gray-500">{apt.time}</span>
+                  <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{apt.time}</span>
                 </td>
-                <td className="py-4 px-6">
-                  {apt.assignedDoctor || <span className="text-gray-400 italic">Not assigned</span>}
+                <td className={`py-4 px-6 ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                  {apt.assignedDoctor || <span className={`italic ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Not assigned</span>}
                 </td>
                 <td className="py-4 px-6">
                   <span
