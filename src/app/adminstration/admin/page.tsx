@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { Users, Calendar, Briefcase, AlertCircle } from "lucide-react";
+import React, { useMemo, useState, useEffect } from "react";
+import { Users, Calendar, Briefcase, AlertCircle, Home, User } from "lucide-react";
 import { usePatients, useDoctors, useServices, useBookings } from "@/app/shared/hooks/useAdminData";
 import { useRouter } from "next/navigation";
 
@@ -22,10 +22,19 @@ const recentAppointments = [
 
 export default function AdminOverview() {
   const router = useRouter();
+  const [adminName, setAdminName] = useState("");
   const { data: patients, isLoading: loadingPatients, error: patientsError } = usePatients();
   const { data: doctors, isLoading: loadingDoctors, error: doctorsError } = useDoctors();
   const { data: services, isLoading: loadingServices, error: servicesError } = useServices();
   const { data: bookings, isLoading: loadingBookings } = useBookings();
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user_data");
+    if (userData) {
+      const user = JSON.parse(userData);
+      setAdminName(user.name || user.email || "Admin");
+    }
+  }, []);
 
   const totalDoctors = doctors?.length || 0;
   const totalPatients = patients?.length || 0;
@@ -80,12 +89,21 @@ export default function AdminOverview() {
       {/* Header */}
       <div className="bg-white border-b px-8 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Hello !</h1>
-          <p className="text-gray-600 text-sm">Welcome to Your Dashboard. Let's help patients to live a healthier and happier life</p>
+          <h1 className="text-2xl font-bold text-gray-800">Hello!</h1>
+          <p className="text-gray-600 text-sm"><span className="text-purple-600 font-semibold">Admin {adminName}</span>, Welcome to Your Dashboard. Let's help patients to live a healthier and happier life</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white text-xl">+</button>
-          <div className="w-10 h-10 bg-purple-500 rounded-full"></div>
+          <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-full">
+            <span className="text-sm font-medium text-purple-900">{adminName}</span>
+            <User className="w-5 h-5 text-purple-600" />
+          </div>
+          <button 
+            onClick={() => router.push('/')}
+            className="w-10 h-10 bg-purple-600 hover:bg-purple-700 rounded-full flex items-center justify-center text-white transition-all"
+            title="Go to Home"
+          >
+            <Home className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
