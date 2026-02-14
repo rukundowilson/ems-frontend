@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import Header from "@/app/components/Header";
-import api from "@/app/shared/services/axios";
+import api, { setAuthToken } from "@/app/shared/services/axios";
 
 function SignInContent() {
   const router = useRouter();
@@ -43,6 +43,8 @@ function SignInContent() {
 
       // Save token and user info
       localStorage.setItem("auth_token", data.token);
+      // Set axios auth header for subsequent requests
+      setAuthToken(data.token);
       const detectedRole = data.data?.role || "patient";
       localStorage.setItem("user_role", detectedRole);
       localStorage.setItem("user_data", JSON.stringify(data.data));

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronLeft, Search, AlertCircle, CheckCircle, Copy } from 'lucide-react';
 import Header from '@/app/components/Header';
 import api from '@/app/shared/services/axios';
+import Footer from '@/app/components/Footer';
 
 interface BookingInfo {
   _id: string;
@@ -102,7 +103,7 @@ export default function BookingSearchPage() {
   return (
     <div className="min-h-screen bg-gray-100">
         <Header/>
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto min-h-screen">
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -288,6 +289,7 @@ export default function BookingSearchPage() {
         )}
       </div>
       <br />
+      <Footer/>
     </div>
   );
 }

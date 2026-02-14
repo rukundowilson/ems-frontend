@@ -66,6 +66,27 @@ export default function QualityByDesign() {
 
         </div>
       </div>
+       {/* CTA Section */}
+      <div className="w-full bg-blue-500  py-16 px-6 border-t border-gray-200 mt-16">
+        <div className="max-w-4xl mx-auto text-center ">
+          <p className="text-sm  text-white font-semibold uppercase tracking-wide mb-3">
+            We're here to help
+          </p>
+          
+          <h2 className="text-3xl text-white lg:text-4xl font-bold mb-8">
+            Ready to give us a try?
+          </h2>
+
+          <div className="w-16 h-0.5 bg-white/50 mx-auto mb-8"></div>
+
+          <button className="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg inline-flex items-center">
+            Get started
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </section>
   );
 }

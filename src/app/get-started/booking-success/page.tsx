@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Mail, Calendar, Clock, Copy, Printer } from 'lucide-react';
 import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
 
 // Convert number to words
 const numberToWords = (num: number): string => {
@@ -126,7 +127,7 @@ function BookingSuccessContent() {
           }
         }
       `}</style>
-      <div className="max-w-3xl mx-auto mt-12">
+      <div className="max-w-3xl mx-auto mt-12 mb-20">
         {/* Print Button */}
         <div className="mb-4 no-print flex gap-3">
           
@@ -227,7 +228,7 @@ function BookingSuccessContent() {
           </div>
         </div>
       </div>
-      <br />
+      <Footer/>
     </div>
   );
 }

@@ -113,7 +113,10 @@ export default function ServicesPage() {
         )}
         
         {/* Footer spacing */}
+        
       </div>
+      <br />
+      <Footer/>
     </div>
   );
 }

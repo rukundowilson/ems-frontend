@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { setAuthToken } from '@/app/shared/services/axios';
 import { useRouter } from 'next/navigation';
 
 const Header = () => {
@@ -17,6 +18,8 @@ const Header = () => {
       const role = typeof window !== 'undefined' ? localStorage.getItem('user_role') : null;
       const userData = typeof window !== 'undefined' ? localStorage.getItem('user_data') : null;
       setIsLogged(!!token);
+      // ensure axios has the auth header set on initial mount
+      setAuthToken(token);
       setUserRole(role);
       if (userData) {
         try {
@@ -46,6 +49,8 @@ const Header = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_role');
     localStorage.removeItem('user_data');
+    // clear axios auth header
+    setAuthToken(null);
     setIsLogged(false);
     setUserName(null);
     setUserRole(null);
