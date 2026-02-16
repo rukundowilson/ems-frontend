@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import Header from "@/app/components/Header";
-import api, { setAuthToken } from "@/app/shared/services/axios";
+import { setAuthToken } from "@/app/shared/services/axios";
+import { signIn as authSignIn, signUp as authSignUp } from "../service/authService";
+import type { SignInPayload, SignUpPayload } from "../types/authTypes";
 
 function SignInContent() {
   const router = useRouter();
@@ -33,18 +35,18 @@ function SignInContent() {
     setLoading(true);
 
     try {
-      const endpoint = isSignUp ? "/signup" : "/login";
       const payload = isSignUp
-        ? { email: formData.email, password: formData.password, name: formData.name, phone: formData.phone, role: "patient" }
-        : { email: formData.email, password: formData.password };
+        ? ({ email: formData.email, password: formData.password, name: formData.name, phone: formData.phone, role: "patient" } as SignUpPayload)
+        : ({ email: formData.email, password: formData.password } as SignInPayload);
 
-      const response = await api.post(`/auth${endpoint}`, payload);
-      const data = response.data;
+      const data = isSignUp ? await authSignUp(payload as SignUpPayload) : await authSignIn(payload as SignInPayload);
 
-      // Save token and user info
-      localStorage.setItem("auth_token", data.token);
-      // Set axios auth header for subsequent requests
-      setAuthToken(data.token);
+      // Save token and user info (guard token may be undefined)
+      if (data?.token) {
+        localStorage.setItem("auth_token", data.token);
+        // Set axios auth header for subsequent requests
+        setAuthToken(data.token);
+      }
       const detectedRole = data.data?.role || "patient";
       localStorage.setItem("user_role", detectedRole);
       localStorage.setItem("user_data", JSON.stringify(data.data));
@@ -54,11 +56,15 @@ function SignInContent() {
       // Redirect to specified URL or based on detected role
       if (redirectUrl) {
         router.push(redirectUrl);
-      } else if (detectedRole === "admin") {
+      } else if (detectedRole === "admin" || detectedRole === "Admin") {
         router.push("/adminstration/admin");
       } else if (detectedRole === "doctor") {
         router.push("/adminstration/doctor");
-      } else {
+      }
+      else if (detectedRole === "receptionist") {
+        router.push("/adminstration/reception");
+      }
+       else {
         router.push("/get-started");
       }
     } catch (err) {
@@ -71,9 +77,9 @@ function SignInContent() {
   return (
     <>
     <Header/>
-    <div className="flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+    <div className="flex items-center justify-center mt-12 p-4">
+      <div className="w-full max-w-md border border-gray-200 bg-white">
+        <div className="bg-white rounded-2xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">EMS</h1>

@@ -27,7 +27,7 @@ const Card = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg border ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`}>
+    <div className={`bg-white rounded-lg border border-blue-600 ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`}>
       {children}
     </div>
   );
