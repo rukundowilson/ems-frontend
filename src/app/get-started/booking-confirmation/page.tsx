@@ -91,7 +91,7 @@ export default function BookingConfirmationPage() {
         <div className="mb-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-semibold mb-4"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-4"
           >
             <ChevronLeft className="w-5 h-5" />
             Back
@@ -139,7 +139,7 @@ export default function BookingConfirmationPage() {
                   return (
                     <label
                       key={method.id}
-                      className="flex items-center p-4 border-2 cursor-pointer transition-all hover:border-purple-300"
+                      className="flex items-center p-4 border-2 cursor-pointer transition-all hover:border-blue-300"
                       style={{
                         borderColor: selectedPayment === method.id ? '#9333ea' : '#e5e7eb',
                         backgroundColor: selectedPayment === method.id ? '#faf5ff' : 'white',
@@ -151,9 +151,9 @@ export default function BookingConfirmationPage() {
                         value={method.id}
                         checked={selectedPayment === method.id}
                         onChange={(e) => setSelectedPayment(e.target.value)}
-                        className="w-4 h-4 accent-purple-600"
+                        className="w-4 h-4 accent-blue-600"
                       />
-                      <IconComponent className="w-6 h-6 text-purple-600 mx-4" />
+                      <IconComponent className="w-6 h-6 text-blue-600 mx-4" />
                       <div className="flex-1">
                         <p className="font-semibold text-gray-900">{method.name}</p>
                         <p className="text-sm text-gray-600">{method.description}</p>
@@ -187,7 +187,7 @@ export default function BookingConfirmationPage() {
 
               <button
                 onClick={handleConfirmBooking}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 py-3 rounded-lg font-bold text-white transition-all"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 py-3 rounded-lg font-bold text-white transition-all"
               >
                 Proceed to Payment
               </button>

@@ -272,7 +272,7 @@ function BookingDetailsContent() {
         <div className="max-w-5xl mx-auto bg-white shadow rounded-lg p-8">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">EMS</div>
+              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">EMS</div>
               <div>
                 <h3 className="text-xl font-bold">EMS Clinic</h3>
                 <p className="text-sm text-gray-600">Healthcare Services</p>
@@ -354,7 +354,7 @@ function BookingDetailsContent() {
         <div className="mb-8">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-semibold mb-4"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-4"
           >
             <ChevronLeft className="w-5 h-5" />
             Back
@@ -383,7 +383,7 @@ function BookingDetailsContent() {
                       name="name"
                       value={(formData as any).name}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                         (errors as any).name ? 'border-red-500' : 'border-gray-200'
                       }`}
                       placeholder="Jane Doe"
@@ -402,7 +402,7 @@ function BookingDetailsContent() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                         errors.email ? 'border-red-500' : 'border-gray-200'
                       }`}
                       placeholder="your@email.com"
@@ -422,7 +422,7 @@ function BookingDetailsContent() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                         errors.phone ? 'border-red-500' : 'border-gray-200'
                       }`}
                       placeholder="+1 (555) 123-4567"
@@ -452,7 +452,7 @@ function BookingDetailsContent() {
                         name="cardName"
                         value={formData.cardName}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                           errors.cardName ? 'border-red-500' : 'border-gray-200'
                         }`}
                         placeholder="John Doe"
@@ -473,7 +473,7 @@ function BookingDetailsContent() {
                           name="cardNumber"
                           value={formData.cardNumber}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                             errors.cardNumber ? 'border-red-500' : 'border-gray-200'
                           }`}
                           placeholder="1234 5678 9012 3456"
@@ -502,7 +502,7 @@ function BookingDetailsContent() {
                           name="expiryDate"
                           value={formData.expiryDate}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                             errors.expiryDate ? 'border-red-500' : 'border-gray-200'
                           }`}
                           placeholder="MM/YY"
@@ -521,7 +521,7 @@ function BookingDetailsContent() {
                           name="cvv"
                           value={formData.cvv}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition ${
+                          className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                             errors.cvv ? 'border-red-500' : 'border-gray-200'
                           }`}
                           placeholder="123"

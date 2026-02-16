@@ -28,4 +28,23 @@ export function setAuthToken(token?: string | null) {
   }
 }
 
+// Attach token from localStorage for every request when available.
+// This handles cases where components trigger requests before a mount-time
+// call to `setAuthToken` (e.g., page-level useEffect runs before Header).
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers = config.headers || {};
+        // Preserve existing headers while setting Authorization
+        (config.headers as any)['Authorization'] = `Bearer ${token}`;
+      }
+    } catch (e) {
+      // ignore localStorage errors
+    }
+  }
+  return config;
+});
+
 export default api;

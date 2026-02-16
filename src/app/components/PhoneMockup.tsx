@@ -67,7 +67,7 @@ const PhoneMockup: React.FC = () => {
 
           {/* Logo */}
           <div className="px-4 pb-5 flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 via-purple-500 to-teal-400 rounded-lg flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 via-blue-500 to-teal-400 rounded-lg flex items-center justify-center shadow-sm">
               <div className="w-6 h-6 border-2 border-white/40 rounded-sm transform rotate-45"></div>
             </div>
             <span className="text-lg font-bold text-gray-900">EMS</span>
@@ -87,7 +87,7 @@ const PhoneMockup: React.FC = () => {
                   className={`
                     rounded-2xl p-4 transition-all duration-200
                     ${item.highlighted 
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg shadow-purple-200' 
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg shadow-blue-200' 
                       : 'bg-white border border-gray-200 hover:border-gray-300'
                     }
                   `}
@@ -95,7 +95,7 @@ const PhoneMockup: React.FC = () => {
                   <div className={`font-bold text-base ${item.highlighted ? 'text-white' : 'text-gray-900'}`}>
                     {item.title}
                   </div>
-                  <div className={`text-sm flex items-center gap-0.5 mt-1 font-medium ${item.highlighted ? 'text-purple-100' : 'text-purple-600'}`}>
+                  <div className={`text-sm flex items-center gap-0.5 mt-1 font-medium ${item.highlighted ? 'text-blue-100' : 'text-blue-600'}`}>
                     Continue
                     <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
                   </div>

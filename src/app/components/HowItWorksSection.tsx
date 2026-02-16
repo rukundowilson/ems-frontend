@@ -30,22 +30,22 @@ const HowItWorksSection: React.FC = () => {
             {/* CTA Link */}
             <a 
               href="#" 
-              className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 font-semibold text-lg transition-colors group"
+              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-semibold text-lg transition-colors group"
             >
               How it works
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
 
-          {/* Right Column - Circular Image with Purple Arc */}
+          {/* Right Column - Circular Image with Blue Arc */}
           <div className="flex justify-center lg:justify-end">
             <div className="relative w-full max-w-lg aspect-square">
-              {/* Purple Arc */}
+              {/* Blue Arc */}
               <svg className="absolute inset-0 w-full h-full -rotate-45" viewBox="0 0 400 400">
                 <defs>
-                  <linearGradient id="purpleArc" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: '#a855f7', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#d946ef', stopOpacity: 1 }} />
+                  <linearGradient id="blueArc" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: '#2563eb', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: '#1e40af', stopOpacity: 1 }} />
                   </linearGradient>
                 </defs>
                 <circle
@@ -53,7 +53,7 @@ const HowItWorksSection: React.FC = () => {
                   cy="200"
                   r="190"
                   fill="none"
-                  stroke="url(#purpleArc)"
+                  stroke="url(#blueArc)"
                   strokeWidth="16"
                   strokeDasharray="280 1000"
                   strokeLinecap="round"

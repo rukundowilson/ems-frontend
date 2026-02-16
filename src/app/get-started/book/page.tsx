@@ -250,7 +250,7 @@ const CalendarContent = () => {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           {/* Booking Slots Section */}
           <div className="mb-8">
-            <h3 className="text-sm font-bold text-purple-600 mb-2">BOOKING SLOTS</h3>
+            <h3 className="text-sm font-bold text-blue-600 mb-2">BOOKING SLOTS</h3>
             <p className="text-gray-600">Choose a day and time that works for you.</p>
           </div>
 
@@ -262,8 +262,8 @@ const CalendarContent = () => {
                 onClick={() => handleDaySelect(day.id)}
                 className={`p-4 rounded-xl text-center transition-all cursor-pointer ${
                   selectedDay === day.id
-                    ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg'
-                    : 'bg-white border-2 border-gray-200 text-gray-900 hover:border-purple-300'
+                    ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-lg'
+                    : 'bg-white border-2 border-gray-200 text-gray-900 hover:border-blue-300'
                 }`}
               >
                 <div className="text-xs font-semibold mb-1">{day.dayName}</div>
@@ -274,7 +274,7 @@ const CalendarContent = () => {
 
           {/* Available Times */}
           <div className="mb-8">
-            <h3 className="text-sm font-bold text-purple-600 mb-4">AVAILABLE TIMES</h3>
+            <h3 className="text-sm font-bold text-blue-600 mb-4">AVAILABLE TIMES</h3>
             {currentTimeSlots.length > 0 ? (
               <div className="grid grid-cols-3 gap-3">
                 {currentTimeSlots.map((slot) => (
@@ -283,8 +283,8 @@ const CalendarContent = () => {
                     onClick={() => handleTimeSelect(slot.time)}
                     className={`p-3 rounded-lg border-2 text-sm font-semibold transition-all cursor-pointer ${
                       selectedTime === slot.time
-                        ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white border-purple-600 shadow-md'
-                        : 'bg-white border-gray-200 text-gray-900 hover:border-purple-300'
+                        ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white border-blue-600 shadow-md'
+                        : 'bg-white border-gray-200 text-gray-900 hover:border-blue-300'
                     }`}
                   >
                     {slot.time}
@@ -312,7 +312,7 @@ const CalendarContent = () => {
             className={`w-full font-bold py-4 rounded-xl transition-all shadow-lg text-white ${
               !selectedTime
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900'
+                : 'bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900'
             }`}
           >
             BOOK YOUR SLOT

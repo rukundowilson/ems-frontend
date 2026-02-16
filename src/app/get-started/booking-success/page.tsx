@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Mail, Calendar, Clock, Copy, Printer } from 'lucide-react';
 import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
 
 // Convert number to words
 const numberToWords = (num: number): string => {
@@ -90,7 +91,7 @@ function BookingSuccessContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
           <p className="text-lg text-gray-600">Processing your booking...</p>
         </div>
       </div>
@@ -126,7 +127,7 @@ function BookingSuccessContent() {
           }
         }
       `}</style>
-      <div className="max-w-3xl mx-auto mt-12">
+      <div className="max-w-3xl mx-auto mt-12 mb-20">
         {/* Print Button */}
         <div className="mb-4 no-print flex gap-3">
           
@@ -154,7 +155,7 @@ function BookingSuccessContent() {
 
           <div className="flex items-center justify-between border-b pb-4 mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-800 rounded-md flex items-center justify-center text-white font-bold text-xl">EMS</div>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-md flex items-center justify-center text-white font-bold text-xl">EMS</div>
               <div>
                 <div className="text-lg font-bold text-gray-900">EMS Clinic</div>
                 <div className="text-xs text-gray-600">Healthcare Services</div>
@@ -227,7 +228,7 @@ function BookingSuccessContent() {
           </div>
         </div>
       </div>
-      <br />
+      <Footer/>
     </div>
   );
 }

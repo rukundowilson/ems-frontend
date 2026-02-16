@@ -55,28 +55,6 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-white">
-      {/* CTA Section */}
-      <div className="w-full bg-purple-600 py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-white text-sm font-semibold uppercase tracking-wide mb-3">
-            We're here to help
-          </p>
-          
-          <h2 className="text-white text-3xl lg:text-4xl font-bold mb-8">
-            Ready to give us a try?
-          </h2>
-
-          <div className="w-16 h-0.5 bg-white/50 mx-auto mb-8"></div>
-
-          <button className="bg-white text-purple-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg inline-flex items-center">
-            Get started
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
       {/* Navigation Links */}
       <div className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -86,7 +64,7 @@ export default function Footer() {
                 <a 
                   key={index}
                   href="#" 
-                  className="text-gray-700 font-medium hover:text-purple-600 transition"
+                  className="text-gray-700 font-medium hover:text-blue-600 transition"
                 >
                   {link}
                 </a>
@@ -131,7 +109,7 @@ export default function Footer() {
                   <a 
                     key={idx}
                     href="#" 
-                    className="block text-gray-700 hover:text-purple-600 transition text-sm"
+                    className="block text-gray-700 hover:text-blue-600 transition text-sm"
                   >
                     {lang.name}
                   </a>
@@ -142,15 +120,33 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Legal Links */}
+        {/* Map Section */}
+        <div className="bg-gray-100 py-8 px-6">
+          <div className="max-w-7xl mx-auto">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Our Location</h3>
+            <div className="w-full">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.493683661161!2d30.057860275772015!3d-1.9559587980263198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca42c75f67b01%3A0xe4e18dbc8a3a43c1!2sUniversity%20Teaching%20Hospital%20of%20Kigali%20(CHUK)!5e0!3m2!1sen!2srw!4v1771063248464!5m2!1sen!2srw"
+                width="100%"
+                height="300"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Legal Links */}
       <div className="bg-white border-t border-gray-200 py-6 px-6">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-            <a href="#" className="hover:text-purple-600 transition">Notice of privacy practices</a>
-            <span>·</span>
-            <a href="#" className="hover:text-purple-600 transition">Terms of use and site privacy</a>
-            <span>·</span>
-            <a href="#" className="hover:text-purple-600 transition">Statement of nondiscrimination</a>
+            <a href="#" className="hover:text-blue-600 transition">Notice of privacy practices</a>
+            <span>•</span>
+            <a href="#" className="hover:text-blue-600 transition">Terms of use and site privacy</a>
+            <span>•</span>
+            <a href="#" className="hover:text-blue-600 transition">Statement of nondiscrimination</a>
           </div>
           
           <div className="flex items-center gap-2">

@@ -340,7 +340,7 @@ export default function AvailabilityCalendar() {
                               setStartTime(s.start);
                               setEndTime(s.end);
                               setTimeRows([{ start: s.start, end: s.end }]);
-                              setEditingId(s.id ?? null);
+                              setEditingId(typeof s.id === 'number' ? s.id.toString() : (s.id ?? null));
                             } else {
                               // open empty modal to add
                               setSelectedDate(key);
