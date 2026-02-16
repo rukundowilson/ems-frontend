@@ -1,13 +1,17 @@
 import axios from 'axios';
 
-const baseURL = typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_BASE_URL
-  ? process.env.NEXT_PUBLIC_API_BASE_URL
-  : 'http://localhost:4000/api';
+
+// Use the environment variable, fallback to localhost if not set
+const baseURL =
+  typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
+    ? process.env.NEXT_PUBLIC_API_URL
+    : 'http://localhost:4000/api';
 
 const api = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
 });
+
 
 // Add request interceptor to automatically include auth token
 api.interceptors.request.use((config) => {
