@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { LogOut } from 'lucide-react';
 import api from '@/app/shared/services/axios';
+import { fetchDoctorCompletions, fetchServices, buildServiceMap } from './bookings/api_calls/bookingService';
 
 interface DoctorUser {
   _id: string;
@@ -51,7 +52,9 @@ export default function DoctorDashboard() {
   const [upcomingAppointmentsState, setUpcomingAppointmentsState] = useState<any[]>([]);
   const [view, setView] = useState<'day' | 'week'>('day');
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [doctorServices, setDoctorServices] = useState<string[]>([]);
+  const [doctorServices, setDoctorServices] = useState<any[]>([]);
+  const [serviceMap, setServiceMap] = useState<Record<string, string>>({});
+  const [completions, setCompletions] = useState<any[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -79,6 +82,25 @@ export default function DoctorDashboard() {
         
         // Fetch all appointments without filtering by doctorId, filter by service on client
         fetchAllAppointments(token);
+        // Fetch completions for this doctor
+        try {
+          const doctorId = parsedDoctor._id;
+          if (doctorId) {
+            fetchDoctorCompletions(doctorId).then((logs) => setCompletions(logs));
+          }
+        } catch (e) {
+          console.error('Error fetching completions:', e);
+        }
+        // Fetch services map to show friendly names instead of IDs
+        (async () => {
+          try {
+            const services = await fetchServices();
+            const map = buildServiceMap(services);
+            setServiceMap(map);
+          } catch (err) {
+            console.error('Error fetching services for map:', err);
+          }
+        })();
       } catch (err) {
         console.error('Failed to parse doctor data:', err);
         setUpcomingAppointmentsState([]);
@@ -325,7 +347,7 @@ export default function DoctorDashboard() {
                 <h2 className="text-lg font-bold text-gray-800">Calendar</h2>
                 <Link href="/adminstration/doctor/calendar" className="text-xs text-teal-600 font-semibold hover:text-teal-700 transition">View All →</Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {(() => {
                   const days = [new Date(), new Date(Date.now() + 24 * 60 * 60 * 1000)];
                   function getAppointmentsForDay(d: Date) {
@@ -363,7 +385,7 @@ export default function DoctorDashboard() {
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="text-xs text-gray-500 truncate">{apt.type}</span>
                                     <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono flex-shrink-0">
-                                      {apt.bookingId ? String(apt.bookingId).substring(0, 6) : apt.id}
+                                      {apt.time || (apt.date ? new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')}
                                     </span>
                                   </div>
                                 </div>
@@ -390,19 +412,25 @@ export default function DoctorDashboard() {
             <div className="mb-4 flex flex-wrap gap-2">
               {doctorServices.length > 0 ? (
                 <>
-                  {doctorServices.map((service: any) => (
-                    <button
-                      key={service}
-                      onClick={() => setSelectedService(service)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                        selectedService === service
-                          ? 'bg-teal-500 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      {service}
-                    </button>
-                  ))}
+                  {doctorServices.map((s: any, idx: number) => {
+                    const key = typeof s === 'string' ? s : (s._id || s.slug || s.title || String(idx));
+                    const label = typeof s === 'string'
+                      ? (serviceMap[String(s)] || s)
+                      : (s.title || s.name || s.slug || JSON.stringify(s));
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedService(s)}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                          selectedService === s
+                            ? 'bg-teal-500 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </>
               ) : (
                 <div className="text-xs text-gray-500">No services assigned</div>
@@ -423,7 +451,7 @@ export default function DoctorDashboard() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-xs text-gray-500">{apt.type}</p>
                         <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded font-mono">
-                          ID: {apt.bookingId ? String(apt.bookingId).substring(0, 8) : apt.id}
+                          {apt.date ? new Date(apt.date).toLocaleDateString() : ''}
                         </span>
                       </div>
                     </div>
@@ -442,19 +470,26 @@ export default function DoctorDashboard() {
             {/* Patient Files */}
             <div className="bg-white rounded-2xl shadow-none p-8">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-800">Patient File</h2>
+                <h2 className="text-lg font-bold text-gray-800">Completed Appointments</h2>
                 <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-xs font-semibold">View All</span>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto">
-                {patientFiles.map((file) => (
-                  <div key={file.id} className="flex items-center gap-3 p-2 hover:bg-blue-50 rounded-lg transition">
-                    <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center flex-shrink-0 text-sm font-bold text-blue-600">📄</div>
-                    <p className="font-semibold text-gray-800 text-xs flex-1 truncate">{file.name}</p>
-                    <span className={`text-xs font-medium px-2 py-1 rounded whitespace-nowrap ${file.status === 'new' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>
-                      {file.status}
-                    </span>
-                  </div>
-                ))}
+                {completions.length === 0 ? (
+                  <div className="text-xs text-gray-400">No completed appointments</div>
+                ) : (
+                  completions.map((c: any) => (
+                    <div key={c._id || c.bookingId} onClick={() => c.bookingId && router.push(`/adminstration/doctor/booking/${c.bookingId}`)} className="flex items-center gap-3 p-2 hover:bg-blue-50 rounded-lg transition cursor-pointer">
+                      <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center flex-shrink-0 text-sm font-bold text-green-600">✓</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-800 text-xs truncate">{c.patientName || 'Patient'}</p>
+                        <div className="text-xs text-gray-500">Service: {c.service} • Appt: {new Date(c.appointmentDate).toLocaleDateString()}</div>
+                      </div>
+                      <span className={`text-xs font-medium px-2 py-1 rounded whitespace-nowrap ${c.rating ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {c.rating ? `Rating: ${c.rating}` : 'No rating'}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

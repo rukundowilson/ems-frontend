@@ -103,7 +103,7 @@ export default function BookingSearchPage() {
   return (
     <div className="min-h-screen bg-gray-100">
         <Header/>
-      <div className="max-w-5xl mx-auto min-h-screen">
+      <div className="max-w-5xl mx-auto min-h-screen mt-12">
         {/* Header */}
         <div className="mb-8">
           <Link
