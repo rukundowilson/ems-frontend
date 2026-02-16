@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import api from '../../shared/services/axios';
+import { signUp as authSignUp } from '../service/authService';
 import Link from 'next/link';
 import { HelpCircle } from 'lucide-react';
 
@@ -82,13 +82,13 @@ function SignUpContent() {
           payload.email = formData.email;
           payload.password = formData.password;
 
-          const res = await api.post('/auth/signup', payload);
-          console.log('Signup response', res.data);
+          const res = await authSignUp(payload as any);
+          console.log('Signup response', res);
           // store JWT token
-          if (res.data.token) {
-            localStorage.setItem('auth_token', res.data.token);
+          if (res.token) {
+            localStorage.setItem('auth_token', res.token);
             localStorage.setItem('user_role', 'patient');
-            localStorage.setItem('user_data', JSON.stringify(res.data.data));
+            localStorage.setItem('user_data', JSON.stringify(res.data));
             console.log('Signup successful, token stored');
             
             // Redirect to specified URL or dashboard
