@@ -114,7 +114,7 @@ function AdminLayoutContent({
             <Calendar className="w-6 h-6 text-white" />
           </Link>
           <Link
-            href="/adminstration/admin/services"
+            href="/adminstration/admin/manage/services"
             className={`w-12 h-12 rounded-lg flex items-center justify-center hover:bg-teal-400 transition ${pathname?.includes("/services") ? "bg-teal-500" : "bg-blue-600 hover:bg-blue-500"}`}
             title="Services"
           >
