@@ -60,7 +60,11 @@ function SignInContent() {
         router.push("/adminstration/admin");
       } else if (detectedRole === "doctor") {
         router.push("/adminstration/doctor");
-      } else {
+      }
+      else if (detectedRole === "receptionist") {
+        router.push("/adminstration/reception");
+      }
+       else {
         router.push("/get-started");
       }
     } catch (err) {
