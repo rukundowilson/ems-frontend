@@ -5,7 +5,7 @@ import axios from 'axios';
 const baseURL =
   typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
     ? process.env.NEXT_PUBLIC_API_URL
-    : 'https://ems-backend-2-jl41.onrender.com';
+    : 'https://ems-backend-2-jl41.onrender.com/api';
 
 const api = axios.create({
   baseURL,
