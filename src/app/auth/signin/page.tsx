@@ -51,6 +51,8 @@ function SignInContent() {
       localStorage.setItem("user_role", detectedRole);
       localStorage.setItem("user_data", JSON.stringify(data.data));
 
+      console.log('Login successful:', { role: detectedRole, data: data.data });
+
       // Redirect to specified URL or based on detected role
       if (redirectUrl) {
         router.push(redirectUrl);

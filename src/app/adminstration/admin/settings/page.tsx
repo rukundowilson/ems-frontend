@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import { Save } from "lucide-react";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 export default function SettingsPage() {
+  const { darkMode } = useTheme();
   const [settings, setSettings] = useState({
     hospitalName: "City Hospital",
     email: "admin@hospital.com",
@@ -20,8 +22,8 @@ export default function SettingsPage() {
   return (
     <div className="p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage system preferences</p>
+        <h1 className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Settings</h1>
+        <p className={`mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manage system preferences</p>
       </div>
 
       <div className="bg-white rounded-xl shadow-md p-6 max-w-2xl">
