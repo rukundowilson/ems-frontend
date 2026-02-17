@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-
-// Use the environment variable, fallback to localhost if not set
 const baseURL =
   typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
     ? process.env.NEXT_PUBLIC_API_URL
