@@ -14,6 +14,7 @@ export default function ReceptionPage() {
   const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,6 +29,21 @@ export default function ReceptionPage() {
       setLoading(false);
     };
     fetchData();
+  }, []);
+
+  // Read user name from localStorage for greeting
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("user_data");
+      if (raw) {
+        const user = JSON.parse(raw);
+        const name = user?.name || user?.patientName || user?.email || null;
+        setUserName(name);
+      }
+    } catch (e) {
+      // ignore parse errors
+    }
   }, []);
 
   // Count appointments per service (today)
@@ -72,8 +88,13 @@ export default function ReceptionPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Reception</h1>
-          <p className="text-gray-600">Manage appointments by service</p>
+          <div className="flex items-baseline justify-between">
+            <div>
+              <div className="text-sm text-gray-600 mb-1">{userName ? `Hello, ${userName}` : 'Welcome'}</div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Reception</h1>
+              <p className="text-gray-600">Manage appointments by service</p>
+            </div>
+          </div>
         </div>
 
         {!selectedService ? (

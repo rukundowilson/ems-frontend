@@ -12,6 +12,7 @@ interface TimeSlot {
   startTime: string;
   endTime: string;
   isAvailable: boolean;
+  isPast?: boolean;
 }
 
 interface DayInfo {
@@ -135,6 +136,7 @@ const CalendarContent = () => {
 
         // Group slots by date
         const byDay: Record<number, TimeSlot[]> = {};
+        const now = Date.now();
 
         generatedDays.forEach((day, idx) => {
           // Find slots for this date
@@ -149,12 +151,19 @@ const CalendarContent = () => {
             const displayEndTime = convertTo12Hour(slot.end);
             const displayRange = `${displayStartTime} - ${displayEndTime}`;
 
+            // Parse date/time into a local Date object to check if slot is in the past
+            const [y, mo, d] = slot.date.split('-').map(Number);
+            const [hh, mm] = slot.start.split(':').map(Number);
+            const slotDateTime = new Date(y, mo - 1, d, hh, mm);
+            const isPast = slotDateTime.getTime() <= now;
+
             return {
               id: `${slot._id}`,
               time: displayRange,
               startTime: slot.start,
               endTime: slot.end,
               isAvailable: true,
+              isPast,
             };
           });
 
@@ -171,6 +180,15 @@ const CalendarContent = () => {
     })();
   }, [serviceId]);
 
+  // Clear selectedTime if it becomes a past slot (e.g., time passes or day changes)
+  useEffect(() => {
+    const slots = timeSlotsByDay[selectedDay] || [];
+    const selected = slots.find(s => s.time === selectedTime);
+    if (selected?.isPast) {
+      setSelectedTime(null);
+    }
+  }, [selectedDay, timeSlotsByDay, selectedTime]);
+
   // Get time slots for the selected day
   const currentTimeSlots = timeSlotsByDay[selectedDay] || [];
 
@@ -182,6 +200,12 @@ const CalendarContent = () => {
 
   // Handle time selection
   const handleTimeSelect = (time: string) => {
+    const slot = currentTimeSlots.find(s => s.time === time);
+    if (slot?.isPast) {
+      setBookingError('This time slot has already passed. Please choose another slot.');
+      return;
+    }
+    setBookingError(null);
     setSelectedTime(time);
   };
 
@@ -216,8 +240,6 @@ const CalendarContent = () => {
       </div>
     );
   }
-
-  
 
   if (loading) {
     return (
@@ -281,10 +303,13 @@ const CalendarContent = () => {
                   <button
                     key={slot.id}
                     onClick={() => handleTimeSelect(slot.time)}
-                    className={`p-3 rounded-lg border-2 text-sm font-semibold transition-all cursor-pointer ${
-                      selectedTime === slot.time
-                        ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white border-blue-600 shadow-md'
-                        : 'bg-white border-gray-200 text-gray-900 hover:border-blue-300'
+                    disabled={!!slot.isPast}
+                    className={`p-3 rounded-lg border-2 text-sm font-semibold transition-all ${
+                      slot.isPast
+                        ? 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed'
+                        : selectedTime === slot.time
+                          ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white border-blue-600 shadow-md'
+                          : 'bg-white border-gray-200 text-gray-900 hover:border-blue-300 cursor-pointer'
                     }`}
                   >
                     {slot.time}

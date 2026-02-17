@@ -11,8 +11,7 @@ const api = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
 });
-
-
+console.log('Axios ss baseURL set to:', api.defaults.baseURL);
 // Add request interceptor to automatically include auth token
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
